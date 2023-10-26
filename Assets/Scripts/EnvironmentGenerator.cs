@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class EnvironmentGenerator : MonoBehaviour
 {
     public List<GameObject> environmentPrefabs = new List<GameObject>();
@@ -21,7 +23,8 @@ public class EnvironmentGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Your code for Exercise 1.1 part 1.) here
+        // 1.1.6
+        GenerateEnvironment();
     }
 
     // Update is called once per frame
@@ -40,7 +43,7 @@ public class EnvironmentGenerator : MonoBehaviour
         return list.Count == 0;
     }
 
-    #nullable enable
+#nullable enable
     GameObject? getRandomGameObjectFrom(List<GameObject> list)
     {
         if (isEmpty(list))
@@ -57,18 +60,94 @@ public class EnvironmentGenerator : MonoBehaviour
         return randomGameObject;
     }
 
-    void GenerateEnvironment()
+    float getRandomFloatBetween(float firstFloat, float secondFloat)
     {
-        // Your code for Exercise 1.1 part 1.) here
+        float smallerFloat = Mathf.Min(firstFloat, secondFloat);
+        float largerFloat = Mathf.Max(firstFloat, secondFloat);
 
-        var randomPrefab = getRandomGameObjectFrom(environmentPrefabs);
+        float randomFloat = Random.Range(smallerFloat, largerFloat);
 
-        if (!randomPrefab)
+        return randomFloat;
+    }
+
+    Vector3 getRandomVectorBetween(Vector3 firstVector, Vector3 secondVector)
+    {
+        float randomX = getRandomFloatBetween(firstVector.x, secondVector.x);
+        float randomY = getRandomFloatBetween(firstVector.y, secondVector.y);
+        float randomZ = getRandomFloatBetween(firstVector.z, secondVector.z);
+
+        Vector3 randomVector = new Vector3(randomX, randomY, randomZ);
+
+        return randomVector;
+    }
+
+    void moveObjectByVector(GameObject gameObject, Vector3 vector)
+    {
+        gameObject.transform.position += vector;
+    }
+
+    void rotateObjectByVector(GameObject gameObject, Vector3 vector)
+    {
+        gameObject.transform.Rotate(vector);
+    }
+
+    void rotateObjectsYAxisRandomly(GameObject gameObject)
+    {
+        /**
+         * @TODO: Find out what they mean by "[...] instances’ up-Vector".
+         * 
+         * Sounds like the game object's Y-axis, so that's what I'll do for now.
+         */
+        Vector3 rotationVector = new Vector3(
+            0,
+            getRandomFloatBetween(1, 360),
+            0);
+
+        rotateObjectByVector(gameObject, rotationVector);
+    }
+
+    List<GameObject> addNRandomGameObjectsTo(
+        List<GameObject> list,
+        int times)
+    {
+        // @TODO: There's "Enumerable.Repeat" we could use instead of pesky for-loops.
+        for (int index = 0; index < times; index++)
         {
-            throw new System.Exception("The given list of prefabs is empty.");
+            //  1.1.1
+            GameObject? randomPrefab = getRandomGameObjectFrom(environmentPrefabs);
+
+            // In case we act stupid.
+            if (!randomPrefab)
+            {
+                throw new System.Exception("The given list of prefabs is empty.");
+            }
+
+            /**
+             * 1.1.2
+             * 
+             * @TODO: Where is the "Prop Generator.gameObject" they talk about under arrow 2?
+             */
+            GameObject instantiatedGameObject = Instantiate(randomPrefab!);
+
+            // 1.2.3
+            moveObjectByVector(
+                instantiatedGameObject,
+                getRandomVectorBetween(generatorBoundsMin, generatorBoundsMax));
+
+            rotateObjectsYAxisRandomly(instantiatedGameObject);
+
+            // 1.2.4
+            list.Add(instantiatedGameObject);
         }
 
-     StartCoroutine(ResolveCollisions());
+        return list;
+    }
+
+    void GenerateEnvironment()
+    {
+        addNRandomGameObjectsTo(instances, numObjects);
+
+        StartCoroutine(ResolveCollisions());
     }
 
     IEnumerator ResolveCollisions()
