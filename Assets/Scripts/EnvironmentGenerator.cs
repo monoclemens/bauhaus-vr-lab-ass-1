@@ -27,10 +27,33 @@ public class EnvironmentGenerator : MonoBehaviour
         GenerateEnvironment();
     }
 
+    // It is recommended to blast Hatebreed when this method executes.
+    void destroyEverything(List<GameObject> gameObjects)
+    {
+        foreach (var gameObject in gameObjects)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
-        // Your code for Exercise 1.1 part 3.) here
+        /**
+         * If we should reset the world, we destroy all added game objects,
+         * remove them from the "instances" list, regenerate the world and 
+         * finally set "reset" back to false so we don't loop forever.
+         */
+        if (reset)
+        {
+            destroyEverything(instances);
+
+            instances.Clear();
+
+            GenerateEnvironment();
+
+            reset = false;
+        }
     }
 
     void ClearEnvironment()
