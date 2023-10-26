@@ -154,7 +154,28 @@ public class EnvironmentGenerator : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
         bool resolveAgain = false;
+
         // Your code for Exercise 1.1 part 2.) here
+
+        foreach (var gameObject in instances)
+        {
+            Collider gameObjectCollider = gameObject.GetComponent<Collider>();
+
+            foreach (var restrictedCollider in restrictedBounds)
+            {
+                if (gameObjectCollider.bounds.Intersects(restrictedCollider.bounds))
+                {
+                    // Taking the easy road here. Just move it to another random position.
+                    moveObjectByVector(
+                        gameObject,
+                        getRandomVectorBetween(generatorBoundsMin, generatorBoundsMax));
+
+                    // Set it to true so we'll check the collisions again in the next method call.
+                    resolveAgain = true;
+                }
+            }
+        }
+
         if (resolveAgain)
             StartCoroutine(ResolveCollisions());
     }
