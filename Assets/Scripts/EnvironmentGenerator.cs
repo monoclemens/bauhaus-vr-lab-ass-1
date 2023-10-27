@@ -116,15 +116,10 @@ public class EnvironmentGenerator : MonoBehaviour
 
     void rotateObjectsYAxisRandomly(GameObject gameObject)
     {
-        /**
-         * @TODO: Find out what they mean by "[...] instances’ up-Vector".
-         * 
-         * Sounds like the game object's Y-axis, so that's what I'll do for now.
-         */
         Vector3 rotationVector = new Vector3(
-            0,
-            getRandomFloatBetween(1, 360),
-            0);
+             0,
+             getRandomFloatBetween(1, 360),
+             0);
 
         rotateObjectByVector(gameObject, rotationVector);
     }
@@ -145,12 +140,7 @@ public class EnvironmentGenerator : MonoBehaviour
                 throw new System.Exception("The given list of prefabs is empty.");
             }
 
-            /**
-             * 1.1.2
-             * 
-             * @TODO: Where is the "Prop Generator.gameObject" they talk about under arrow 2?
-             */
-            GameObject instantiatedGameObject = Instantiate(randomPrefab!);
+            GameObject instantiatedGameObject = Instantiate(randomPrefab!, gameObject.transform);
 
             // 1.2.3
             moveObjectByVector(
@@ -166,9 +156,12 @@ public class EnvironmentGenerator : MonoBehaviour
         return list;
     }
 
+
+
     void GenerateEnvironment()
     {
-        addNRandomGameObjectsTo(instances, numObjects);
+        Debug.Log(restrictedBounds.Count);
+        addNRandomGameObjectsTo(instances,numObjects);
 
         StartCoroutine(ResolveCollisions());
     }
@@ -176,6 +169,7 @@ public class EnvironmentGenerator : MonoBehaviour
     IEnumerator ResolveCollisions()
     {
         yield return new WaitForSeconds(2);
+        
         bool resolveAgain = false;
 
         // Your code for Exercise 1.1 part 2.) here
