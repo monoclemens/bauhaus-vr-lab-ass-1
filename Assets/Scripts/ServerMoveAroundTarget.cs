@@ -48,9 +48,9 @@ public class ServerMoveAroundTarget : NetworkBehaviour
         // Your code for Exercise 1.2 here
         Vector3 moveDirection = newPosition - transform.position;
         moveDirection.y = 0; // Ignore the y-component
-        transform.rotation = Quaternion.LookRotation(moveDirection);
+        
 
 
-        return transform.rotation;
+        return Quaternion.LookRotation(moveDirection);
     }
 }
