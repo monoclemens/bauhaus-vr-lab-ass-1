@@ -2,11 +2,115 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnvironmentGenerationHelper : MonoBehaviour
+public class EnvironmentGenerator : MonoBehaviour
 {
-    private readonly System.Random random = new();
+    public List<GameObject> environmentPrefabs = new();
 
-    public void DestroyAll(List<GameObject> gameObjects)
+    private readonly List<GameObject> instances = new();
+
+    public List<Collider> restrictedBounds = new();
+
+    public int numObjects = 30;
+
+    public Vector3 generatorBoundsMin = new(-30, 0, -30);
+
+    public Vector3 generatorBoundsMax = new(30, 0, 30);
+
+    public bool reset = false;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        Debug.Log("Starting...");
+
+        // 1.1.6
+        GenerateEnvironment();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (reset)
+        {
+            Debug.Log("Resetting Environment...");
+
+            ClearEnvironment();
+
+            GenerateEnvironment();
+
+            reset = false;
+        }
+    }
+
+    void ClearEnvironment()
+    {
+        Debug.Log("Clearing Environment...");
+
+        DestroyAll(instances);
+
+        instances.Clear();
+    }
+
+    void GenerateEnvironment()
+    {
+        Debug.Log("Generate Environment...");
+
+        PopulateWorld(
+            environmentPrefabs,
+            instances,
+            generatorBoundsMin,
+            generatorBoundsMax,
+            numObjects
+        );
+
+        StartCoroutine(ResolveCollisions());
+    }
+
+    /**
+     * This method resolves collisions between newly created game objects and the central house.
+     * 
+     * If there is a collision, it will simply move the colliding game object and check for collisions again.
+     */
+    IEnumerator ResolveCollisions()
+    {
+        Debug.Log("Resolving Collisions...");
+
+        yield return new WaitForSeconds(2);
+
+        bool resolveAgain = false;
+
+        // Your code for Exercise 1.1 part 2.) here
+        foreach (var gameObject in instances)
+        {
+            Collider gameObjectCollider = gameObject.GetComponent<Collider>();
+
+            foreach (var restrictedCollider in restrictedBounds)
+            {
+                if (gameObjectCollider.bounds.Intersects(restrictedCollider.bounds))
+                {
+                    Debug.Log("Collision detected for Game Object: " + gameObject.name);
+
+                    MoveObjectByVector(
+                        gameObject,
+                        GetRandomVectorBetween(generatorBoundsMin, generatorBoundsMax));
+
+                    resolveAgain = true;
+                }
+            }
+        }
+
+        if (resolveAgain)
+        {
+            StartCoroutine(ResolveCollisions());
+        } else
+        {
+            Debug.Log("No Collisions detected.");
+        }
+    }
+
+    private readonly System.Random random = new System.Random();
+
+    private void DestroyAll(List<GameObject> gameObjects)
     {
         foreach (GameObject gameObject in gameObjects)
         {
@@ -41,7 +145,7 @@ public class EnvironmentGenerationHelper : MonoBehaviour
         return randomFloat;
     }
 
-    public Vector3 GetRandomVectorBetween(Vector3 firstVector, Vector3 secondVector)
+    private Vector3 GetRandomVectorBetween(Vector3 firstVector, Vector3 secondVector)
     {
         float randomX = GetRandomFloatBetween(firstVector.x, secondVector.x);
         float randomY = GetRandomFloatBetween(firstVector.y, secondVector.y);
@@ -52,9 +156,9 @@ public class EnvironmentGenerationHelper : MonoBehaviour
         return randomVector;
     }
 
-    public void MoveObjectByVector(GameObject gameObject, Vector3 vector)
+    private void MoveObjectByVector(GameObject gameObject, Vector3 vector)
     {
-        gameObject.transform.position += vector;
+        gameObject.transform.position = vector;
     }
 
     private void RotateObjectByVector(GameObject gameObject, Vector3 vector)
@@ -72,7 +176,7 @@ public class EnvironmentGenerationHelper : MonoBehaviour
         RotateObjectByVector(gameObject, rotationVector);
     }
 
-    public List<GameObject> PopulateWorld(
+    private List<GameObject> PopulateWorld(
         List<GameObject> prefabs,
         List<GameObject> instances,
         Vector3 boundsMin,
@@ -103,98 +207,5 @@ public class EnvironmentGenerationHelper : MonoBehaviour
         }
 
         return instances;
-    }
-
-}
-
-public class EnvironmentGenerator : MonoBehaviour
-{
-    public List<GameObject> environmentPrefabs = new();
-
-    private readonly List<GameObject> instances = new();
-
-    public List<Collider> restrictedBounds = new();
-
-    public int numObjects = 30;
-
-    public Vector3 generatorBoundsMin = new(-30, 0, -30);
-
-    public Vector3 generatorBoundsMax = new(30, 0, 30);
-
-    public bool reset = false;
-
-    private readonly EnvironmentGenerationHelper helper = new();
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        // 1.1.6
-        GenerateEnvironment();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (reset)
-        {
-            ClearEnvironment();
-
-            GenerateEnvironment();
-
-            reset = false;
-        }
-    }
-
-    void ClearEnvironment()
-    {
-        helper.DestroyAll(instances);
-
-        instances.Clear();
-    }
-
-    void GenerateEnvironment()
-    {
-        helper.PopulateWorld(
-            environmentPrefabs,
-            instances,
-            generatorBoundsMin,
-            generatorBoundsMax,
-            numObjects
-        );
-
-        StartCoroutine(ResolveCollisions());
-    }
-
-    /**
-     * This method resolves collisions between newly created game objects and the central house.
-     * 
-     * If there is a collision, it will simply move the colliding game object and check for collisions again.
-     */
-    IEnumerator ResolveCollisions()
-    {
-        yield return new WaitForSeconds(2);
-
-        bool resolveAgain = false;
-
-        // Your code for Exercise 1.1 part 2.) here
-        foreach (var gameObject in instances)
-        {
-            Collider gameObjectCollider = gameObject.GetComponent<Collider>();
-
-            foreach (var restrictedCollider in restrictedBounds)
-            {
-                if (gameObjectCollider.bounds.Intersects(restrictedCollider.bounds))
-                {
-                    helper.MoveObjectByVector(
-                        gameObject,
-                        helper.GetRandomVectorBetween(generatorBoundsMin, generatorBoundsMax));
-
-                    resolveAgain = true;
-                }
-            }
-        }
-
-        if (resolveAgain)
-            StartCoroutine(ResolveCollisions());
     }
 }
