@@ -13,8 +13,11 @@ public class ServerTimedRotate : NetworkBehaviour
         if (!IsServer)
             return;
 
+        
+        
+
         // Your code for Exercise 1.4 here 
-        Vector3 rotation = new Vector3(degreesPerSecondX, degreesPerSecondY, degreesPerSecondZ) * Time.deltaTime;
+        Vector3 rotation = new Vector3(degreesPerSecondX, degreesPerSecondY, degreesPerSecondZ) * Time.deltaTime ;
         transform.Rotate(rotation, Space.World);
     }
 
