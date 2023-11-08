@@ -23,6 +23,7 @@ public class ServerTimedRotate : NetworkBehaviour
         Vector3 normalizedRotation = rotation * Time.deltaTime;
         
         // Around the world, baby!
-        transform.Rotate(normalizedRotation, Space.World);
+        transform.Rotate(normalizedRotation, Space.Self);
+
     }
 }
