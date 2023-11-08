@@ -12,44 +12,42 @@ public class ServerMoveAroundTarget : NetworkBehaviour
     {
         if (!IsServer)
             return;
+
         var newPosition = CalculatePositionUpdate();
         var newRotation = CalculateRotationUpdate(newPosition);
-        transform.position = newPosition;
-        transform.rotation = newRotation;
-    }
 
-    
+        transform.SetPositionAndRotation(newPosition, newRotation);
+    }
 
     Vector3 CalculatePositionUpdate()
     {
-        Vector3 upVector = Vector3.up;  // The axis around which to rotate
+        // The axis around which to rotate.
+        Vector3 upVector = Vector3.up;
 
-        // Calculate the rotation angle for the current frame
+        // Calculate the rotation angle for the current frame.
         float rotationAngle = degreesPerSecond * Time.deltaTime;
 
-        // Calculate the position of the object relative to the target
+        // Rotate the relative position around the target using Quaternion.
+        Quaternion rotation = Quaternion.AngleAxis(rotationAngle, upVector);
+
+        // Calculate the position of the object relative to the target.
         Vector3 relativePosition = transform.position - target.transform.position;
 
-        // Rotate the relative position around the target using Quaternion
-        Quaternion rotation = Quaternion.AngleAxis(rotationAngle, upVector);
-        relativePosition = rotation * relativePosition;
+        // Add rotation to the equation.
+        Vector3 rotatedRelativePosition = rotation * relativePosition;
 
-        Vector3 newPosition = target.transform.position + relativePosition;
+        Vector3 newPosition = target.transform.position + rotatedRelativePosition;
 
         return newPosition;
     }
-
-    
-
-  
 
     Quaternion CalculateRotationUpdate(Vector3 newPosition)
     {
         // Your code for Exercise 1.2 here
         Vector3 moveDirection = newPosition - transform.position;
-        moveDirection.y = 0; // Ignore the y-component
-        
 
+        // Ignore the y-component
+        moveDirection.y = 0;
 
         return Quaternion.LookRotation(moveDirection);
     }
