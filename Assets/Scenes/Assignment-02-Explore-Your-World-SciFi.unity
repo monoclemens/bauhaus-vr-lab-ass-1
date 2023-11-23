@@ -2847,7 +2847,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   userPrefabs:
   - UserRole: 1
-    UserPrefab: {fileID: 7216047633976425198, guid: 809cce775431de842bae2eca7c27e046, type: 3}
+    UserPrefab: {fileID: 7216047633976425198, guid: d87c00b4c83fbbd44a3a50977dc5f04f, type: 3}
   - UserRole: 0
     UserPrefab: {fileID: 8231461269131396514, guid: a261985c04347724aae188d2bb71865f, type: 3}
   spawnPoints:
