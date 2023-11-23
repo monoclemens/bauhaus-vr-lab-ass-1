@@ -25,7 +25,6 @@ public class TeleportNavigation : MonoBehaviour
     private float rayActivationThreshhold = 0.01f;
     private float teleportActivationThreshhold = 0.5f;
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -37,19 +36,35 @@ public class TeleportNavigation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // activate line
+        /****************
+         * Exercise 2.8 *
+         ****************/
+
+        // Read the current force applied to the teleporting hand.
         float teleportActionValue = teleportAction.action.ReadValue<float>();
-        if (teleportActionValue > rayActivationThreshhold && !rayIsActive)
+
+        // If there's no input but the ray is active, just hide everything related to teleport.
+        if (teleportActionValue < rayActivationThreshhold && rayIsActive)
         {
-            rayIsActive = true;
-            lineVisual.enabled = rayIsActive;
-            hitpoint.SetActive(true); // show
+            ChangeRayVisibility(false);
         }
-        else if (teleportActionValue < rayActivationThreshhold && rayIsActive)
+
+        // If there is an input value but the ray is inactive, show everything related to teleport.
+        else if (teleportActionValue > rayActivationThreshhold && !rayIsActive)
         {
-            rayIsActive = false;
-            lineVisual.enabled = rayIsActive;
-            hitpoint.SetActive(false); // hide
+            ChangeRayVisibility(true);
+        }
+
+        if (rayIsActive)
+        {
+            Collider navigationPlatformGeometryCollider = navigationPlatformGeometry.GetComponent<Collider>();
+            Collider lineVisualCollider = lineVisual.GetComponent<Collider>();
+
+            // Check if the ray collides with the platform.
+            if (navigationPlatformGeometryCollider.bounds.Intersects(lineVisualCollider.bounds))
+            {
+                // TODO: We need to find out how to get the collision vector to put the hitpoint there.
+            }
         }
 
         // Exercise 2.8 Teleport Navigation
@@ -61,5 +76,10 @@ public class TeleportNavigation : MonoBehaviour
         // }
     }
 
-
-}   
+    void ChangeRayVisibility(bool isVisible)
+    {
+        rayIsActive = isVisible;
+        lineVisual.enabled = isVisible;
+        hitpoint.SetActive(isVisible);
+    }
+}
