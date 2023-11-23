@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,48 +9,58 @@ public class ServerMoveAroundTarget : NetworkBehaviour
 
     public float degreesPerSecond = 20;
 
+    private Vector3 targetPositionXZ
+    {
+        get
+        {
+            return new Vector3(target.position.x, 0, target.position.z);
+        }
+    }
+
+    private Vector3 positionXZ
+    {
+        get
+        {
+            return new Vector3(transform.position.x, 0, transform.position.z);
+        }
+    }
+
+    private Vector3 directionToTarget
+    {
+        get
+        {
+            return (targetPositionXZ - positionXZ);
+        }
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (!IsServer)
             return;
-
         var newPosition = CalculatePositionUpdate();
         var newRotation = CalculateRotationUpdate(newPosition);
-
-        transform.SetPositionAndRotation(newPosition, newRotation);
+        transform.position = newPosition;
+        transform.rotation = newRotation;
     }
 
     Vector3 CalculatePositionUpdate()
     {
-        // The axis around which to rotate.
-        Vector3 upVector = Vector3.up;
-
-        // Calculate the rotation angle for the current frame.
-        float rotationAngle = degreesPerSecond * Time.deltaTime;
-
-        // Rotate the relative position around the target using Quaternion.
-        Quaternion rotation = Quaternion.AngleAxis(rotationAngle, upVector);
-
-        // Calculate the position of the object relative to the target.
-        Vector3 relativePosition = transform.position - target.transform.position;
-
-        // Add rotation to the equation.
-        Vector3 rotatedRelativePosition = rotation * relativePosition;
-
-        Vector3 newPosition = target.transform.position + rotatedRelativePosition;
-
+        var y = transform.position.y;
+        var newPosition = targetPositionXZ - RotationUtils.ManualYRotation(directionToTarget, degreesPerSecond * Time.deltaTime);
+        newPosition.y = y;
         return newPosition;
     }
 
     Quaternion CalculateRotationUpdate(Vector3 newPosition)
     {
-        // Your code for Exercise 1.2 here
-        Vector3 moveDirection = newPosition - transform.position;
-
-        // Ignore the y-component
-        moveDirection.y = 0;
-
-        return Quaternion.LookRotation(moveDirection);
+        var movementDir = newPosition - transform.position;
+        return Quaternion.LookRotation(movementDir.normalized, Vector3.up);
     }
 }

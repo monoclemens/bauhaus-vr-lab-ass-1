@@ -55,20 +55,15 @@ public class ServerArmSwingSimulation : NetworkBehaviour
         var newPosition = CalculatePositionUpdate();
         transform.localPosition = newPosition;
     }
-    
+
     Vector3 CalculatePositionUpdate()
     {
         var x = localStartPosition.x;
         var degrees = maximumSwingDegrees * Mathf.Sin(speedFactor*Time.time);
         if (flipDirection)
             degrees = -degrees;
-        var newPosition = anchorPositionYZ - EulerXRotation(directionToAnchor, degrees);
+        var newPosition = anchorPositionYZ - RotationUtils.EulerXRotation(directionToAnchor, degrees);
         newPosition.x = x;
         return newPosition;
-    }
-    
-    private static Vector3 EulerXRotation(Vector3 directionYZ, float degrees)
-    {
-        return Quaternion.Euler(degrees, 0, 0) * directionYZ;
     }
 }

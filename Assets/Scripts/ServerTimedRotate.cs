@@ -1,4 +1,5 @@
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ServerTimedRotate : NetworkBehaviour
@@ -6,24 +7,22 @@ public class ServerTimedRotate : NetworkBehaviour
     public float degreesPerSecondX = 0;
     public float degreesPerSecondY = 20;
     public float degreesPerSecondZ = 0;
+    
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
 
     // Update is called once per frame
     void Update()
     {
         if (!IsServer)
             return;
-
-        // Your code for Exercise 1.4 here 
-        Vector3 rotation = new(
-            degreesPerSecondX, 
-            degreesPerSecondY, 
-            degreesPerSecondZ);
-
-        // Ensure that frame rates don't affect the rotation speed by including deltatime in the equation.
-        Vector3 normalizedRotation = rotation * Time.deltaTime;
-        
-        // Around the world, baby!
-        transform.Rotate(normalizedRotation, Space.Self);
-
+        transform.localRotation *= Quaternion.Euler(
+            degreesPerSecondX * Time.deltaTime,
+            degreesPerSecondY * Time.deltaTime,
+            degreesPerSecondZ * Time.deltaTime
+        );    
     }
 }

@@ -81,7 +81,6 @@ namespace VRSYS.Core.Networking
 
         private void JoinLobby()
         {
-            //transform.root.gameObject.SetActive(false);
             ConnectionManager.Instance.JoinLobby(lobbyData.LobbyId);
         }
 
