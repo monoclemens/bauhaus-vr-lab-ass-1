@@ -43,16 +43,15 @@ public class TeleportNavigation : MonoBehaviour
         // Read the current force applied to the teleporting hand.
         float teleportActionValue = teleportAction.action.ReadValue<float>();
 
-        // If there's no input but the ray is active, just hide everything related to teleport.
-        if (teleportActionValue < rayActivationThreshhold && rayIsActive)
-        {
-            ChangeRayVisibility(false);
-        }
+        bool isValueGreaterThanRayThreshold = teleportActionValue > rayActivationThreshhold;
 
-        // If there is an input value but the ray is inactive, show everything related to teleport.
-        else if (teleportActionValue > rayActivationThreshhold && !rayIsActive)
+        /**
+         * If the value is greater than the threshold, the ray should be active and vice versa.
+         * If that's not the case, toggle the ray.
+         */
+        if (isValueGreaterThanRayThreshold != rayIsActive)
         {
-            ChangeRayVisibility(true);
+            ToggleRay();
         }
 
         if (rayIsActive)
@@ -76,7 +75,10 @@ public class TeleportNavigation : MonoBehaviour
         // }
     }
 
-    void ChangeRayVisibility(bool isVisible)
+
+    private void ToggleRay() => ChangeRayVisibility(!rayIsActive);
+
+    private void ChangeRayVisibility(bool isVisible)
     {
         rayIsActive = isVisible;
         lineVisual.enabled = isVisible;
