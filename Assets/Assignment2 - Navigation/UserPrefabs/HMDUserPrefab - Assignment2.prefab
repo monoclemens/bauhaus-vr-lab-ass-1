@@ -2735,6 +2735,7 @@ MonoBehaviour:
   hitpoint: {fileID: 8507988258694234099}
   navigationPlatformGeometry: {fileID: 4045002499303239265}
   rayLength: 10
+  previewAvatarPlaced: 0
   lineVisual: {fileID: 6318285025732098406}
 --- !u!1 &7216047634103647853
 GameObject:
