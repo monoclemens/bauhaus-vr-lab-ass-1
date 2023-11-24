@@ -22,8 +22,8 @@ public class TeleportNavigation : MonoBehaviour
     private bool rayIsActive = false;
 
     public XRInteractorLineVisual lineVisual;
-    private float rayActivationThreshhold = 0.01f;
-    private float teleportActivationThreshhold = 0.5f;
+    private readonly float rayActivationThreshhold = 0.01f;
+    private readonly float teleportActivationThreshhold = 0.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -44,25 +44,49 @@ public class TeleportNavigation : MonoBehaviour
         float teleportActionValue = teleportAction.action.ReadValue<float>();
 
         bool isValueGreaterThanRayThreshold = teleportActionValue > rayActivationThreshhold;
+        bool isValueGreaterThanTeleportThreshold = teleportActionValue > teleportActivationThreshhold;
 
         /**
-         * If the value is greater than the threshold, the ray should be active and vice versa.
-         * If that's not the case, toggle the ray.
+         * If the value is greater than the ray threshold, the ray should be active and vice versa.
+         * If that's not the case, toggle the ray on/off.
          */
         if (isValueGreaterThanRayThreshold != rayIsActive)
         {
+            Debug.Log("Toggling the ray " + (rayIsActive ? "off..." : "on..."));
+
             ToggleRay();
         }
 
-        if (rayIsActive)
+        /**
+         * If the ray is active but we're not adjusting the teleport yet, 
+         * show the hitpoint where the ray hits the layer mask.
+         */
+        if (rayIsActive && !isValueGreaterThanTeleportThreshold)
         {
-            Collider navigationPlatformGeometryCollider = navigationPlatformGeometry.GetComponent<Collider>();
-            Collider lineVisualCollider = lineVisual.GetComponent<Collider>();
+            Debug.Log("Showing the ray...");
 
-            // Check if the ray collides with the platform.
-            if (navigationPlatformGeometryCollider.bounds.Intersects(lineVisualCollider.bounds))
+            Vector3 origin = lineVisual.transform.localPosition;
+            Vector3 direction = lineVisual.transform.rotation.eulerAngles;
+
+            Debug.Log("Calculating a hitpoint with the layer mask...");
+
+            bool isHittingLayerMask = Physics.Raycast(origin, direction, out RaycastHit hitInfo, rayLength, groundLayerMask);
+
+            /** 
+             * Put the hitpoint where the ray collided with the ground layer mask.
+             * If there is no collision, deactivate the hitpoint so it doesn't float anywhere needlessly.
+             */
+            if (isHittingLayerMask)
             {
-                // TODO: We need to find out how to get the collision vector to put the hitpoint there.
+                Debug.Log("Hit found: " + hitInfo.ToString());
+
+                hitpoint.transform.position = hitInfo.point;
+            }
+            else
+            {
+                Debug.Log("No hit found.");
+
+                hitpoint.SetActive(false);
             }
         }
 
