@@ -4,6 +4,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
+enum UserState
+{
+    Idle, // Nothing.
+    CastingRay, // Only showing the ray.
+    AdjustingAvatar, // Showing both the ray and the preview avatar.
+    ReleasedTrigger, // The state between going from AdjustingAvatar to Idle.
+}
+
 public class TeleportNavigation : MonoBehaviour
 {
     public InputActionProperty teleportAction;
@@ -27,12 +35,47 @@ public class TeleportNavigation : MonoBehaviour
     private readonly float rayActivationThreshhold = 0.01f;
     private readonly float teleportActivationThreshhold = 0.5f;
 
+    private UserState userState = UserState.Idle;
+
     // Start is called before the first frame update
     void Start()
     {
         lineVisual.enabled = false;
         hitpoint.SetActive(false);
         previewAvatar.SetActive(false);
+    }
+
+    // This method only figures out in which state the user is.
+    private UserState CalculateNextUserState ()
+    {
+        // Read the current force applied to the teleporting hand.
+        float teleportActionValue = teleportAction.action.ReadValue<float>();
+
+        bool isValueGreaterThanRayThreshold = teleportActionValue > rayActivationThreshhold;
+        bool isValueGreaterThanTeleportThreshold = teleportActionValue > teleportActivationThreshhold;
+
+        // If the user just crossed the ray threshold, we should be casting the ray.
+        if (userState == UserState.Idle && isValueGreaterThanRayThreshold)
+        {
+            return UserState.CastingRay;
+        }
+        // If the user crossed the teleport threshold, show the preview avatar.
+        else if (userState == UserState.CastingRay && isValueGreaterThanTeleportThreshold)
+        {
+            return UserState.AdjustingAvatar;
+        }
+        // If the user is adjusting the teleport but the force becomes smaller than the teleport threshold, they released the trigger.
+        else if (userState == UserState.AdjustingAvatar && !isValueGreaterThanTeleportThreshold) 
+        {
+            return UserState.ReleasedTrigger;
+        } 
+        // If the user released the trigger and the force is smaller than the ray threshold, we should go back to idling.
+        else if (userState == UserState.ReleasedTrigger && !isValueGreaterThanRayThreshold)
+        {
+            return UserState.Idle;
+        }
+        // Otherwise nothing important changed. Just return the current value.
+        return userState;
     }
 
     // Update is called once per frame
@@ -42,12 +85,9 @@ public class TeleportNavigation : MonoBehaviour
          * Exercise 2.8 *
          ****************/
 
-        // Read the current force applied to the teleporting hand.
-        float teleportActionValue = teleportAction.action.ReadValue<float>();
+        UserState nextUserState = CalculateNextUserState();
 
-        bool isValueGreaterThanRayThreshold = teleportActionValue > rayActivationThreshhold;
-        bool isValueGreaterThanTeleportThreshold = teleportActionValue > teleportActivationThreshhold;
-        
+
 
         /**
          * If the value is greater than the ray threshold, the ray should be active and vice versa.
@@ -77,21 +117,32 @@ public class TeleportNavigation : MonoBehaviour
             }
             else
             {
-               
+
                 previewAvatar.SetActive(false);
                 previewAvatarPlaced = false;
 
             }
 
-            
+
 
 
         }
         //need to deactivate when ray is inactive cause it floats needlessly otherwise
-        else {
-           
-           DeactivateHitPoint();
-            
+        else
+        {
+
+            DeactivateHitPoint();
+
+        }
+
+        /**
+         * In this case we assume the user released the trigger and we should jump.
+         */
+        if (previewAvatarPlaced && !isValueGreaterThanTeleportThreshold)
+        {
+            Debug.Log("Jumping!");
+
+            PerformTeleport();
         }
 
         // Exercise 2.8 Teleport Navigation
@@ -134,8 +185,8 @@ public class TeleportNavigation : MonoBehaviour
 
     private void ShowPreviewAvatar(Vector3 hitPosition)
     {
-       
-            //place the preview avatar if not previously placed
+
+        //place the preview avatar if not previously placed
         if (!previewAvatarPlaced)
         {
             Vector3 previewAvatarPosition = hitPosition;
@@ -157,8 +208,8 @@ public class TeleportNavigation : MonoBehaviour
         }
 
 
-    
-        
+
+
     }
     //doesn't work properly yet
     //TODO: where should the function be placed is the question
@@ -173,7 +224,7 @@ public class TeleportNavigation : MonoBehaviour
     {
         rayIsActive = isVisible;
         lineVisual.enabled = isVisible;
-        
+
     }
     //prettier looking activation setters
     private void DeactivateHitPoint()
