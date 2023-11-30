@@ -121,7 +121,7 @@ public class TeleportNavigation : MonoBehaviour
 
                 var (_, hitInfo) = CalculateHitPointCollision();
 
-                if (previewAvatarPlaced)
+                if (previewAvatarPlaced == false)
                 {
                     SetPreviewAvatar(hitInfo.point);
 
