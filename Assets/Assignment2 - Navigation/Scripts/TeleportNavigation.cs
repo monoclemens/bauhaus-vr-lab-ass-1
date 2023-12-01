@@ -134,21 +134,23 @@ public class TeleportNavigation : MonoBehaviour
 
                 break;
             /**
-             * If the trigger is released:
+             * If the trigger is released IN THE CURRENT FRAME:
              *      - move the user to the preview avatar's position
              *      - rotate the user to the preview avatar's rotation
              *      - reset previewAvatarPlaced
              *      - hide the ray, hit point and the preview avatar.
              */
             case UserState.ReleasedTrigger:
-                PerformTeleport();
+                if (teleportAction.action.WasReleasedThisFrame())
+                {
+                    PerformTeleport();
 
-                previewAvatarPlaced = false;
+                    previewAvatarPlaced = false;
 
-                HideAll();
+                    HideAll();
+                }
 
                 break;
-
         }
     }
 
@@ -221,8 +223,31 @@ public class TeleportNavigation : MonoBehaviour
     //TODO: where should the function be placed is the question
     private void PerformTeleport()
     {
-        transform.position = previewAvatar.transform.position;
-        transform.rotation = previewAvatar.transform.rotation;
+
+        var previewAvatarMatrix = previewAvatar.transform.localToWorldMatrix;
+
+        var localHeadMatrix = Matrix4x4.TRS(
+            head.localPosition,
+            head.localRotation,
+            head.localScale
+        );
+
+        var newPosition = previewAvatarMatrix * localHeadMatrix.inverse;
+
+        transform.position = newPosition.GetColumn(3);
+        // transform.rotation = newPosition.rotation;
+        transform.localScale = newPosition.lossyScale;
+
+        /*
+        Vector3 newPosition = new(
+            previewAvatar.transform.position.x,    
+            previewAvatar.transform.x,    
+            previewAvatar.transform.z
+        );
+        */
+
+        // transform.position = previewAvatar.transform.position - head.localPosition;
+        // transform.rotation = previewAvatar.transform.rotation;
     }
 
     private void ChangeRayVisibility(bool isVisible)
