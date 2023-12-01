@@ -62,28 +62,32 @@ public class TeleportNavigation : MonoBehaviour
 
         var (isHittingLayerMask, _) = CalculateHitPointCollision();
 
-        Debug.Log("User state is casting ray: " + (userState == UserState.CastingRay));
-        Debug.Log(isValueGreaterThanTeleportThreshold);
-        Debug.Log(isHittingLayerMask);
-
         // If the user just crossed the ray threshold, we should be casting the ray.
         if (userState == UserState.Idle && isValueGreaterThanRayThreshold)
         {
+            Debug.Log("New state: CastingRay");
+
             return UserState.CastingRay;
         }
         // If the user crossed the teleport threshold AND if there is a hit point collision, show the preview avatar.
         else if (userState == UserState.CastingRay && isValueGreaterThanTeleportThreshold && isHittingLayerMask)
         {
+            Debug.Log("New state: AdjustingAvatar");
+
             return UserState.AdjustingAvatar;
         }
         // If the user is adjusting the teleport but the force becomes smaller than the teleport threshold, they released the trigger.
         else if (userState == UserState.AdjustingAvatar && !isValueGreaterThanTeleportThreshold)
         {
+            Debug.Log("New state: ReleasedTrigger");
+
             return UserState.ReleasedTrigger;
         }
         // If the user released the trigger and the force is smaller than the ray threshold, we should go back to idling.
         else if (userState == UserState.ReleasedTrigger && !isValueGreaterThanRayThreshold)
         {
+            Debug.Log("New state: Idle");
+
             return UserState.Idle;
         }
         // Otherwise nothing important changed. Just return the current value.
@@ -219,8 +223,6 @@ public class TeleportNavigation : MonoBehaviour
         previewAvatar.transform.rotation = yRotationOnly;
     }
 
-    //doesn't work properly yet
-    //TODO: where should the function be placed is the question
     private void PerformTeleport()
     {
 
@@ -232,22 +234,13 @@ public class TeleportNavigation : MonoBehaviour
             head.localScale
         );
 
+
         var newPosition = previewAvatarMatrix * localHeadMatrix.inverse;
 
         transform.position = newPosition.GetColumn(3);
-        // transform.rotation = newPosition.rotation;
+        // Had to inverse the y rotation because the avatar models face opposite directions.
+        transform.rotation = newPosition.rotation * Quaternion.AngleAxis(180, Vector3.up);
         transform.localScale = newPosition.lossyScale;
-
-        /*
-        Vector3 newPosition = new(
-            previewAvatar.transform.position.x,    
-            previewAvatar.transform.x,    
-            previewAvatar.transform.z
-        );
-        */
-
-        // transform.position = previewAvatar.transform.position - head.localPosition;
-        // transform.rotation = previewAvatar.transform.rotation;
     }
 
     private void ChangeRayVisibility(bool isVisible)
@@ -274,20 +267,3 @@ public class TeleportNavigation : MonoBehaviour
         hitpoint.SetActive(true);
     }
 }
-
-
-/*lock the preview avatar in place as soon as we exceed the teleport threshold
-                if (isValueGreaterThanTeleportThreshold && !previewAvatarPlaced)
-                {
-                    Vector3 previewAvatarPosition = hitInfo.point;
-                    previewAvatarPosition.y = head.position.y;
-                    previewAvatar.SetActive(true);
-                    previewAvatar.transform.position = previewAvatarPosition;
-                    previewAvatar.SetActive(false);
-                    previewAvatarPlaced = true;
-                }
-                else if (!isValueGreaterThanTeleportThreshold)
-                {
-                    previewAvatarPlaced = false;
-
-                }*/
