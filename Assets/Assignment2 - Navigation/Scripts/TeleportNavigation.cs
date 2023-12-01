@@ -225,22 +225,31 @@ public class TeleportNavigation : MonoBehaviour
 
     private void PerformTeleport()
     {
-
+        // Get a matrix representation of the preview avatar.
         var previewAvatarMatrix = previewAvatar.transform.localToWorldMatrix;
 
+        // And one of the head.
         var localHeadMatrix = Matrix4x4.TRS(
             head.localPosition,
             head.localRotation,
             head.localScale
         );
 
+        // To get the new place, multiply the preview avatar's matrix with the inverse of our head's matrix.
+        // This way the local offsets are cancelled out of the new place.
+        var newPlaceMatrix = previewAvatarMatrix * localHeadMatrix.inverse;
 
-        var newPosition = previewAvatarMatrix * localHeadMatrix.inverse;
+        // Set the position and scale straight away.
+        transform.position = newPlaceMatrix.GetColumn(3);
+        transform.localScale = newPlaceMatrix.lossyScale;
 
-        transform.position = newPosition.GetColumn(3);
         // Had to inverse the y rotation because the avatar models face opposite directions.
-        transform.rotation = newPosition.rotation * Quaternion.AngleAxis(180, Vector3.up);
-        transform.localScale = newPosition.lossyScale;
+        transform.rotation = newPlaceMatrix.rotation * Quaternion.AngleAxis(180, Vector3.up);
+
+        // Remove all axis rotations but the y axis.
+        Quaternion newRotation = transform.rotation;
+        newRotation.eulerAngles = new Vector3(0, newRotation.eulerAngles.y, 0);
+        transform.rotation = newRotation;
     }
 
     private void ChangeRayVisibility(bool isVisible)
