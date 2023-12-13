@@ -6,17 +6,27 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class RayHitpointSerializer : NetworkBehaviour
 {
+    //public XRInteractorLineVisual lineVisual;
     public GameObject hitpoint;
     public LineRenderer ray;
     public Transform hand;
     private NetworkVariable<bool> rayHitpointEnabled = new NetworkVariable<bool>(default, writePerm: NetworkVariableWritePermission.Owner);
     private NetworkVariable<Vector3> hitpointPosition = new NetworkVariable<Vector3>(default, writePerm: NetworkVariableWritePermission.Owner);
- 
+
+    // Start is called before the first frame update
+    void Start()
+    {
+
+    }
+
+    #region NetworkBehaviour Callbacks
+
     public override void OnNetworkSpawn()
     {
         hitpoint.SetActive(false);
         ray.positionCount = 2;
         ray.enabled = false;
+        //lineVisual.enabled = false;
 
         if (IsOwner)
             return;
@@ -24,6 +34,12 @@ public class RayHitpointSerializer : NetworkBehaviour
         ApplyRayUpdates();
     }
 
+<<<<<<< Updated upstream
+=======
+    #endregion
+
+    #region MonoBehaviour Callbacks
+>>>>>>> Stashed changes
 
     private bool SerializeRayUpdates(out bool rayEnabled, out Vector3 hitPos)
     {
@@ -65,9 +81,11 @@ public class RayHitpointSerializer : NetworkBehaviour
                 hitpointPosition.Value = pos;
             }
         }
-        else if (!IsOwner)
+        else
         {
             ApplyRayUpdates();
         }
     }
+
+    #endregion
 }

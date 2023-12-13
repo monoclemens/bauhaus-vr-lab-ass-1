@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Assignment-02-Explore-Your-World-SciFi.unity
     guid: c498f5c0144973e44b4a3f5e70cf43d5
+  - enabled: 1
+    path: Assets/Scenes/Assignment-03-Interact-With-Your-World-SciFi.unity
+    guid: fc9a178c3f7c84640a75e32f843e7d6e
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 62e0e3abe5950f842a4437d31ee77e56, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 53f10e5ede4f01c4a82a76f175227d18, type: 2}

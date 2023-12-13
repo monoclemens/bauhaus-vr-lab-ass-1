@@ -4,14 +4,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
-enum UserState
-{
-    Idle, // Nothing.
-    CastingRay, // Only showing the ray.
-    AdjustingAvatar, // Showing both the ray and the preview avatar.
-    ReleasedTrigger, // The state between going from AdjustingAvatar to Idle.
-}
-
 public class TeleportNavigation : MonoBehaviour
 {
     public InputActionProperty teleportAction;
@@ -22,35 +14,34 @@ public class TeleportNavigation : MonoBehaviour
     public LayerMask groundLayerMask;
 
     public GameObject previewAvatar;
+    //public GameObject previewPlatform;
     public GameObject hitpoint;
 
     public GameObject navigationPlatformGeometry;
 
     public float rayLength = 10.0f;
+
     private bool rayIsActive = false;
-    //added to activate the rotation selection for the previewavatar to start
-    public bool previewAvatarPlaced = false;
+    private bool previewIsActive = false;
+
+    private Vector3 currentHitPoint;
+    private Vector3 targetPoint;
 
     public XRInteractorLineVisual lineVisual;
-    private readonly float rayActivationThreshhold = 0.01f;
-    private readonly float teleportActivationThreshhold = 0.5f;
+    private LineRenderer lineRenderer;
+    private float rayActivationThreshhold = 0.01f;
+    private float teleportActivationThreshhold = 0.5f;
 
-    private UserState userState = UserState.Idle;
 
     // Start is called before the first frame update
     void Start()
     {
-        HideAll();
-    }
-
-    // This method just hides anything of relevance.
-    private void HideAll()
-    {
         lineVisual.enabled = false;
         hitpoint.SetActive(false);
         previewAvatar.SetActive(false);
-    }
+        //previewPlatform.SetActive(false);
 
+<<<<<<< Updated upstream
     // This method only figures out in which state the user is.
     private UserState CalculateNextUserState()
     {
@@ -92,139 +83,116 @@ public class TeleportNavigation : MonoBehaviour
         }
         // Otherwise nothing important changed. Just return the current value.
         return userState;
+=======
+        //if (lineRenderer == null)
+        //{
+        //    lineRenderer = GetComponent<LineRenderer>();
+        //}
+>>>>>>> Stashed changes
     }
 
     // Update is called once per frame
     void Update()
     {
-        /****************
-         * Exercise 2.8 *
-         ****************/
-
-        userState = CalculateNextUserState();
-
-        switch (userState)
+        // activate line
+        float teleportActionValue = teleportAction.action.ReadValue<float>();
+        if (teleportActionValue > rayActivationThreshhold && !rayIsActive)
         {
-            // If we're idling, hide the ray, the hit point and the preview avatar.
-            case UserState.Idle:
-                HideAll();
-
-                break;
-            // If we're casting the ray, activate the ray, but only if it's inactive.
-            // Then, show the hit point where it collides with the layer mask, but only if it does collide with the layer mask.
-            case UserState.CastingRay:
-                ActivateInactiveRay();
-
-                ShowCollidingHitPoint();
-
-                break;
-            // If we're adjusting the avatar, start showing the avatar and change its rotation according to the ray's hit point.
-            // We'll ignore the ray because it should already be active.
-            case UserState.AdjustingAvatar:
-                ShowCollidingHitPoint();
-
-                var (_, hitInfo) = CalculateHitPointCollision();
-
-                if (previewAvatarPlaced == false)
-                {
-                    SetPreviewAvatar(hitInfo.point);
-
-                    previewAvatarPlaced = true;
-                }
-                else
-                {
-                    RotatePreviewAvatar(hitInfo.point);
-                }
-
-                break;
-            /**
-             * If the trigger is released IN THE CURRENT FRAME:
-             *      - move the user to the preview avatar's position
-             *      - rotate the user to the preview avatar's rotation
-             *      - reset previewAvatarPlaced
-             *      - hide the ray, hit point and the preview avatar.
-             */
-            case UserState.ReleasedTrigger:
-                if (teleportAction.action.WasReleasedThisFrame())
-                {
-                    PerformTeleport();
-
-                    previewAvatarPlaced = false;
-
-                    HideAll();
-                }
-
-                break;
+            rayIsActive = true;
+            lineVisual.enabled = rayIsActive;
         }
-    }
-
-    private (bool isHittingLayerMask, RaycastHit hitInfo) CalculateHitPointCollision()
-    {
-        Debug.Log("Calculating a hitpoint with the layer mask...");
-
-        Vector3 origin = hand.position;
-        Vector3 direction = hand.forward;
-
-        bool isHittingLayerMask = Physics.Raycast(
-            origin,
-            direction,
-            out RaycastHit hitInfo,
-            rayLength,
-            groundLayerMask
-        );
-
-        if (isHittingLayerMask)
+        else if (teleportActionValue < rayActivationThreshhold && rayIsActive)
         {
-            Debug.Log("Hit point found!");
+            rayIsActive = false;
+            lineVisual.enabled = rayIsActive;
         }
+<<<<<<< Updated upstream
         else
         {
             Debug.Log("No hit point found.");
         }
+=======
 
-        return (isHittingLayerMask, hitInfo);
-    }
-
-    private void ShowCollidingHitPoint()
-    {
-        var (isHittingLayerMask, hitInfo) = CalculateHitPointCollision();
-
-        if (isHittingLayerMask)
+        if (rayIsActive)
         {
-            hitpoint.transform.position = hitInfo.point;
+            if (Physics.Raycast(hand.position, hand.forward * rayLength, out RaycastHit hit, 10f, groundLayerMask))
+            {
+                currentHitPoint = hit.point;
+                Debug.Log("hit:" + hit.transform.name);
+                ShowHitpoint(currentHitPoint);
+                if (teleportActionValue > teleportActivationThreshhold && !previewIsActive)
+                {
+                    previewIsActive = true;
+                    SetTeleportTarget(currentHitPoint);
+>>>>>>> Stashed changes
 
-            ActivateHitPoint();
+                    // Show Avatar
+                    float userHeight = head.transform.position.y - this.transform.position.y;
+                    Quaternion avatarOrientation = Quaternion.LookRotation(head.transform.position - new Vector3(currentHitPoint.x, head.transform.position.y, currentHitPoint.z));
+                    ShowPreview(currentHitPoint + new Vector3(0, userHeight, 0), avatarOrientation);
+                }
+                else if (previewIsActive) // jump action active -> update
+                {
+                    // Update Avatar
+                    float userHeight = head.position.y - this.transform.position.y;
+                    Vector3 previewAvatarPosition = new Vector3(previewAvatar.transform.position.x, currentHitPoint.y + userHeight, previewAvatar.transform.position.z);
+                    Quaternion avatarOrientation = Quaternion.LookRotation(previewAvatar.transform.position - new Vector3(currentHitPoint.x, previewAvatar.transform.position.y, currentHitPoint.z));
+                    ShowPreview(previewAvatarPosition, avatarOrientation);
+                }
+                //else
+                //{
+                //    ShowHitpoint(currentHitPoint);
+                //}
+            }
+            else
+            {
+                HideHitpoint();
+                HidePreview();
+            }        
         }
         else
         {
-            DeactivateHitPoint();
+            HideHitpoint();
+            HidePreview();
+        }
+
+        // jump action triggered and released -> perform jump
+        if (previewIsActive && teleportActionValue < teleportActivationThreshhold)
+        {
+            PerformJump();
+            previewIsActive = false;
+
+            HideHitpoint();
+            HidePreview();
         }
     }
 
-    private void SetPreviewAvatar(Vector3 position)
+    private void PerformJump()
     {
-        Vector3 previewAvatarPosition = position;
-        previewAvatarPosition.y = head.position.y;
-        previewAvatar.SetActive(true);
-        previewAvatar.transform.position = previewAvatarPosition;
+        Quaternion goalOrientation = Quaternion.LookRotation(new Vector3(currentHitPoint.x, previewAvatar.transform.position.y, currentHitPoint.z) - previewAvatar.transform.position);
+        Vector3 goalRotY = new Vector3(0f, goalOrientation.eulerAngles.y, 0f);
+        Matrix4x4 goalMat = Matrix4x4.TRS(targetPoint, Quaternion.Euler(goalRotY), new Vector3(1, 1, 1));
 
-        // Set the initial rotation to match the head object
-        previewAvatar.transform.rotation = head.rotation;
+        Vector3 headYRot = new Vector3(0f, head.transform.localRotation.eulerAngles.y, 0f);
+        Vector3 headXZPos = new Vector3(head.transform.localPosition.x, 0f, head.transform.localPosition.z);
+        Matrix4x4 headMat = Matrix4x4.TRS(headXZPos, Quaternion.Euler(headYRot), new Vector3(1, 1, 1));
+
+        Matrix4x4 newMat = goalMat * Matrix4x4.Inverse(headMat);
+
+        transform.position = newMat.GetColumn(3);
+        transform.rotation = newMat.rotation;
+        transform.localScale = newMat.lossyScale;
     }
 
-    private void RotatePreviewAvatar(Vector3 hitPointPosition)
+    private void ShowHitpoint(Vector3 worldPos)
     {
-        // Calculate the rotation to face towards the hitpoint
-        Quaternion lookRotation = Quaternion.LookRotation(previewAvatar.transform.position - hitPointPosition, Vector3.up);
-
-        // Lock rotation to only rotate around the y-axis
-        Quaternion yRotationOnly = Quaternion.Euler(0f, lookRotation.eulerAngles.y, 0f);
-
-        previewAvatar.transform.rotation = yRotationOnly;
+        hitpoint.SetActive(true); // show
+        hitpoint.transform.position = worldPos;
     }
 
-    private void PerformTeleport()
+    private void HideHitpoint()
     {
+<<<<<<< Updated upstream
         // Get a matrix representation of the preview avatar.
         var previewAvatarMatrix = previewAvatar.transform.localToWorldMatrix;
 
@@ -250,29 +218,25 @@ public class TeleportNavigation : MonoBehaviour
         Quaternion newRotation = transform.rotation;
         newRotation.eulerAngles = new Vector3(0, newRotation.eulerAngles.y, 0);
         transform.rotation = newRotation;
+=======
+        hitpoint.SetActive(false); // hide
+>>>>>>> Stashed changes
     }
 
-    private void ChangeRayVisibility(bool isVisible)
+    private void ShowPreview(Vector3 worldPos, Quaternion worldRot)
     {
-        rayIsActive = isVisible;
-        lineVisual.enabled = isVisible;
+        previewAvatar.SetActive(true); // show
+        previewAvatar.transform.position = worldPos;
+        previewAvatar.transform.rotation = worldRot;
     }
 
-    // This method activates the ray only if it is inactive.
-    private void ActivateInactiveRay()
+    private void HidePreview()
     {
-        if (rayIsActive && lineVisual.enabled) return;
-
-        ChangeRayVisibility(true);
+        previewAvatar.SetActive(false); // hide
     }
 
-    //prettier looking activation setters
-    private void DeactivateHitPoint()
+    private void SetTeleportTarget(Vector3 targetPos)
     {
-        hitpoint.SetActive(false);
+        targetPoint = targetPos;
     }
-    private void ActivateHitPoint()
-    {
-        hitpoint.SetActive(true);
-    }
-}
+}   
