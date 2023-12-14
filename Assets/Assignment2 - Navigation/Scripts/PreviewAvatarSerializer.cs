@@ -4,14 +4,10 @@ using UnityEngine;
 public class PreviewAvatarSerializer : NetworkBehaviour
 {
     public GameObject previewAvatar;
-<<<<<<< Updated upstream
-    
-=======
     private NetworkVariable<bool> previewAvatarEnabled = new NetworkVariable<bool>(default, writePerm: NetworkVariableWritePermission.Owner);
     private NetworkVariable<Vector3> previewAvatarPosition = new NetworkVariable<Vector3>(default, writePerm: NetworkVariableWritePermission.Owner);
     private NetworkVariable<Quaternion> previewAvatarDirection = new NetworkVariable<Quaternion>(default, writePerm: NetworkVariableWritePermission.Owner);
 
->>>>>>> Stashed changes
     // Start is called before the first frame update
     void Start()
     {
@@ -27,8 +23,6 @@ public class PreviewAvatarSerializer : NetworkBehaviour
         if (IsOwner)
             return;
        
-<<<<<<< Updated upstream
-=======
         ApplyPreviewUpdates();
     }
 
@@ -63,37 +57,24 @@ public class PreviewAvatarSerializer : NetworkBehaviour
             previewAvatar.transform.position = previewAvatarPosition.Value;
             previewAvatar.transform.rotation = previewAvatarDirection.Value;
         }
->>>>>>> Stashed changes
     }
-
 
     private void Update()
     {
         if (IsOwner)
         {
-<<<<<<< Updated upstream
-            
-=======
             if (SerializePreviewUpdates(out bool enabled, out Vector3 pos, out Quaternion dir))
             {
                 previewAvatarEnabled.Value = enabled;
                 previewAvatarPosition.Value = pos;
                 previewAvatarDirection.Value = dir;
             }
->>>>>>> Stashed changes
         }
         else
         {
-<<<<<<< Updated upstream
-            
-        }
-    }
-
-=======
             ApplyPreviewUpdates();
         }
     }
 
     #endregion
->>>>>>> Stashed changes
 }

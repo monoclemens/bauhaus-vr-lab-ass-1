@@ -25,8 +25,6 @@ public class VirtualHand : MonoBehaviour
     private GameObject grabbedObject;
     private Matrix4x4 offsetMatrix;
 
-    private bool grabbed = false;
-
     private bool canGrab
     {
         get
@@ -108,14 +106,8 @@ public class VirtualHand : MonoBehaviour
             if (grabbedObject == null && handCollider.isColliding && canGrab)
             {
                 grabbedObject = handCollider.collidingObject;
-            }
-            //set the parent if not previously set
-            if (grabbedObject != null && grabbedObject.transform.parent == null)
-            {
+                //set the parent
                 grabbedObject.transform.SetParent(transform);
-                Vector3 offset = transform.InverseTransformPoint(grabbedObject.transform.position);
-                Debug.Log(transform.position.ToString());
-                Debug.Log(offset.ToString());
             }
             
         }
@@ -136,46 +128,25 @@ public class VirtualHand : MonoBehaviour
         // use this function to implement an object-grabbing that uses an offset calculation without snapping (and no re-parenting!)
         if (grabAction.action.IsPressed())
         {
+
             if (grabbedObject == null && handCollider.isColliding && canGrab)
             {
                 grabbedObject = handCollider.collidingObject;
+                offsetMatrix = GetTransformationMatrix(transform, true).inverse * GetTransformationMatrix(grabbedObject.transform, true);
             }
-            if (grabbedObject != null && !grabbed)
+            if (grabbedObject != null)
             {
-                Matrix4x4 handMatrix = GetTransformationMatrix(transform);
-                Matrix4x4 grabbedObjectMatrix = GetTransformationMatrix(grabbedObject.transform);
-
-                // Calculate the offset matrix by multiplying the inverse of thisObjectMatrix with grabbedObjectMatrix
-                Matrix4x4 offsetMatrix = handMatrix.inverse * grabbedObjectMatrix;
-                grabbed = true;
-
-                Vector3 offset = offsetMatrix.GetColumn(3);
-                Debug.Log(transform.position.ToString());
-                Debug.Log(offset.ToString());
+                Matrix4x4 newTransformationMatrix = GetTransformationMatrix(transform, true) * offsetMatrix;
+                grabbedObject.transform.position = newTransformationMatrix.GetColumn(3);
+                grabbedObject.transform.rotation = Quaternion.LookRotation(newTransformationMatrix.GetColumn(2), newTransformationMatrix.GetColumn(1));
                 
             }
-            if (grabbedObject != null && grabbed)
-            {
-                // Extract the position from the offsetMatrix
-                Vector3 offset = offsetMatrix.GetColumn(3);
-                Vector3 newPosition = transform.position + offset;
-
-                Quaternion offsetRotation = Quaternion.LookRotation(
-                offsetMatrix.GetColumn(2),
-                offsetMatrix.GetColumn(1));
-                Quaternion newRotation = transform.rotation * offsetRotation;
-
-                grabbedObject.transform.position = newPosition;
-                
-            }
-
         }
         else if (grabAction.action.WasReleasedThisFrame())
         {
             if (grabbedObject != null)
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
             grabbedObject = null;
-            grabbed = false;
 
         }
 

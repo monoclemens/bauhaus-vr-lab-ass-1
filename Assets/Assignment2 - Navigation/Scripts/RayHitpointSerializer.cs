@@ -34,12 +34,9 @@ public class RayHitpointSerializer : NetworkBehaviour
         ApplyRayUpdates();
     }
 
-<<<<<<< Updated upstream
-=======
     #endregion
 
     #region MonoBehaviour Callbacks
->>>>>>> Stashed changes
 
     private bool SerializeRayUpdates(out bool rayEnabled, out Vector3 hitPos)
     {
