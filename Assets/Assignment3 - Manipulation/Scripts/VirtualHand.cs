@@ -115,6 +115,7 @@ public class VirtualHand : MonoBehaviour
         {
             if (grabbedObject != null)
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
+            //reset the parent to null
             grabbedObject.transform.SetParent(null);
             grabbedObject = null;
             
@@ -132,11 +133,14 @@ public class VirtualHand : MonoBehaviour
             if (grabbedObject == null && handCollider.isColliding && canGrab)
             {
                 grabbedObject = handCollider.collidingObject;
+                //get the initial offset from the object to the hand
                 offsetMatrix = GetTransformationMatrix(transform, true).inverse * GetTransformationMatrix(grabbedObject.transform, true);
             }
             if (grabbedObject != null)
             {
+                //calculate the new transformation based on initial offset and the changing hand position
                 Matrix4x4 newTransformationMatrix = GetTransformationMatrix(transform, true) * offsetMatrix;
+                //get the translation column and rotation and set them
                 grabbedObject.transform.position = newTransformationMatrix.GetColumn(3);
                 grabbedObject.transform.rotation = Quaternion.LookRotation(newTransformationMatrix.GetColumn(2), newTransformationMatrix.GetColumn(1));
                 
