@@ -6,34 +6,24 @@ public class VirtualHand : MonoBehaviour
 {
     #region Member Variables
 
-    private enum VirtualHandsMethod 
+    private enum VirtualHandsMethod
     {
         Snap,
         Reparenting,
         Calculation
     }
 
-    [Header("Input Actions")] 
+    [Header("Input Actions")]
     public InputActionProperty grabAction;
     public InputActionProperty toggleAction;
 
     [Header("Configuration")]
     [SerializeField] private VirtualHandsMethod grabMethod;
     public HandCollider handCollider;
-    
+
     // calculation variables
     private GameObject grabbedObject;
     private Matrix4x4 offsetMatrix;
-
-    private bool canGrab
-    {
-        get
-        {
-            if (handCollider.isColliding)
-                return handCollider.collidingObject.GetComponent<ManipulationSelector>().RequestGrab();
-            return false;
-        }
-    }
 
     #endregion
 
@@ -41,21 +31,29 @@ public class VirtualHand : MonoBehaviour
 
     private void Start()
     {
-        if(GetComponentInParent<NetworkObject>() != null)
-            if (!GetComponentInParent<NetworkObject>().IsOwner)
-            {
-                Destroy(this);
-                return;
-            }
+        var networkObject = GetComponentInParent<NetworkObject>();
+
+        // If there is a network object but we're not the owner, destroy the VirtualHand.
+        if (networkObject != null && networkObject.IsOwner == false)
+        {
+            Destroy(this);
+
+            return;
+        }
     }
 
     private void Update()
     {
         if (toggleAction.action.WasPressedThisFrame())
         {
-            grabMethod = (VirtualHandsMethod)(((int)grabMethod + 1) % 3);
+            int nextMethodIndex = (int)grabMethod + 1;
+
+            // Apply modulo to make sure the index gets wrapped around to 0 once it hits 3.
+            int remainder = nextMethodIndex % 3;
+
+            grabMethod = (VirtualHandsMethod)(remainder);
         }
-        
+
         switch (grabMethod)
         {
             case VirtualHandsMethod.Snap:
@@ -74,25 +72,39 @@ public class VirtualHand : MonoBehaviour
 
     #region Grab Methods
 
+    /**
+     * Simple grabbing via snapping. This uses the hand only.
+     * 
+     * If the user is grabbing, either store the newly grabbed and colliding (!) object (if available)
+     * or update the transform of the already grabbed object.
+     * 
+     * If the user just released the grab, release the colliding object if there is one. 
+     * Set the grabbed object to null anyway.
+     */
     private void SnapGrab()
     {
         if (grabAction.action.IsPressed())
         {
-            if (grabbedObject == null && handCollider.isColliding && canGrab)
+            if (grabbedObject == null && handCollider.isColliding && CanGrab)
             {
                 grabbedObject = handCollider.collidingObject;
             }
 
             if (grabbedObject != null)
             {
-                grabbedObject.transform.position = transform.position;
-                grabbedObject.transform.rotation = transform.rotation;
+                grabbedObject.transform.SetPositionAndRotation(
+                    transform.position, 
+                    transform.rotation
+                );
             }
         }
         else if (grabAction.action.WasReleasedThisFrame())
         {
-            if(grabbedObject != null)
+            if (grabbedObject != null)
+            {
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
+            }
+
             grabbedObject = null;
         }
     }
@@ -103,13 +115,13 @@ public class VirtualHand : MonoBehaviour
         // use this function to implement an object-grabbing that re-parents the object to the hand without snapping
         if (grabAction.action.IsPressed())
         {
-            if (grabbedObject == null && handCollider.isColliding && canGrab)
+            if (grabbedObject == null && handCollider.isColliding && CanGrab)
             {
                 grabbedObject = handCollider.collidingObject;
                 //set the parent
                 grabbedObject.transform.SetParent(transform);
             }
-            
+
         }
         else if (grabAction.action.WasReleasedThisFrame())
         {
@@ -118,7 +130,7 @@ public class VirtualHand : MonoBehaviour
             //reset the parent to null
             grabbedObject.transform.SetParent(null);
             grabbedObject = null;
-            
+
         }
 
     }
@@ -130,7 +142,7 @@ public class VirtualHand : MonoBehaviour
         if (grabAction.action.IsPressed())
         {
 
-            if (grabbedObject == null && handCollider.isColliding && canGrab)
+            if (grabbedObject == null && handCollider.isColliding && CanGrab)
             {
                 grabbedObject = handCollider.collidingObject;
                 //get the initial offset from the object to the hand
@@ -143,7 +155,7 @@ public class VirtualHand : MonoBehaviour
                 //get the translation column and rotation and set them
                 grabbedObject.transform.position = newTransformationMatrix.GetColumn(3);
                 grabbedObject.transform.rotation = Quaternion.LookRotation(newTransformationMatrix.GetColumn(2), newTransformationMatrix.GetColumn(1));
-                
+
             }
         }
         else if (grabAction.action.WasReleasedThisFrame())
@@ -154,7 +166,7 @@ public class VirtualHand : MonoBehaviour
 
         }
 
-        
+
     }
 
     #endregion
@@ -170,6 +182,22 @@ public class VirtualHand : MonoBehaviour
         else
         {
             return Matrix4x4.TRS(t.localPosition, t.localRotation, t.localScale);
+        }
+    }
+
+    private bool CanGrab
+    {
+        get
+        {
+            if (handCollider.isColliding == false)
+                return false;
+
+            bool isAllowedToGrab = handCollider
+                .collidingObject
+                .GetComponent<ManipulationSelector>()
+                .RequestGrab();
+
+            return isAllowedToGrab;
         }
     }
 
