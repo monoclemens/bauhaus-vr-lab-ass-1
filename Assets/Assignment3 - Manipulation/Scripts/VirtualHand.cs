@@ -25,6 +25,12 @@ public class VirtualHand : MonoBehaviour
     private GameObject grabbedObject;
     private Matrix4x4 offsetMatrix;
 
+    private Vector3 globalInitialHandPosition;
+    private Quaternion globalInitialHandRotation;
+
+    private Vector3 globalInitialObjectPosition;
+    private Quaternion globalInitialObjectRotation;
+
     #endregion
 
     #region MonoBehaviour Callbacks
@@ -163,6 +169,14 @@ public class VirtualHand : MonoBehaviour
             {
                 grabbedObject = handCollider.collidingObject;
 
+                // Store the hand's current transform.
+                globalInitialHandPosition = transform.position;
+                globalInitialHandRotation = transform.rotation;
+
+                // Store the object's initial transform, too.
+                globalInitialObjectPosition = grabbedObject.transform.position;
+                globalInitialObjectRotation = grabbedObject.transform.rotation;
+
                 // Get the hand's global transform and inverse it.
                 var globalHandTransformationMatrix = GetTransformationMatrix(transform, true);
                 var inverseGlobalHandTransformationMatrix = globalHandTransformationMatrix.inverse;
@@ -177,18 +191,13 @@ public class VirtualHand : MonoBehaviour
             // Calculate the grabbed object's transform whenever there is a grabbed object.
             if (grabbedObject != null)
             {
-                // Calculate the new transformation based on initial offset and the changing hand position.
-                var globalHandTransform = GetTransformationMatrix(transform, true);
-
-                Matrix4x4 newTransformationMatrix = globalHandTransform * offsetMatrix;
+                var globalHandTransformPositionDelta = transform.position - globalInitialHandPosition;
+                var globalHandTransformRotationDelta = transform.rotation * Quaternion.Inverse(globalInitialHandRotation);
 
                 // Get both the translation column and rotation and set them.
                 grabbedObject.transform.SetPositionAndRotation(
-                    newTransformationMatrix.GetColumn(3), 
-                    Quaternion.LookRotation(
-                        newTransformationMatrix.GetColumn(2), 
-                        newTransformationMatrix.GetColumn(1)
-                    )
+                    globalInitialObjectPosition + globalHandTransformPositionDelta, 
+                    globalInitialObjectRotation * globalHandTransformRotationDelta
                 );
             }
         }
