@@ -83,6 +83,8 @@ public class VirtualHand : MonoBehaviour
      */
     private void SnapGrab()
     {
+        Debug.Log("SnapGrab");
+
         if (grabAction.action.IsPressed())
         {
             if (grabbedObject == null && handCollider.isColliding && CanGrab)
@@ -111,6 +113,8 @@ public class VirtualHand : MonoBehaviour
 
     private void ReparentingGrab()
     {
+        Debug.Log("ReparentingGrab");
+
         // TODO: Your solution for excercise 3.4.
         // Use this function to implement an object-grabbing that re-parents the object to the hand without snapping.
         if (grabAction.action.IsPressed())
@@ -138,9 +142,18 @@ public class VirtualHand : MonoBehaviour
         }
     }
 
-    // TODO: It snaps for some reason, even though we take into account the position offset.
+    /** TODO: It snaps for some reason, even though we take into account the position offset.
+     * 
+     * Note: Both the position and rotation of the hand are just added to the object, 
+     * like simply overriding it.
+     * 
+     * Note2: It looks like object is transforming with the hand being the origin. Also, the further away we are from the world origin,
+     * the further away the object is from our hand.
+     */
     private void CalculationGrab()
     {
+        Debug.Log("CalculationGrab");
+
         // TODO: your solution for excercise 3.4.
         // Use this function to implement an object-grabbing that uses an offset calculation without snapping (and no re-parenting!)
         if (grabAction.action.IsPressed())
@@ -166,6 +179,7 @@ public class VirtualHand : MonoBehaviour
             {
                 // Calculate the new transformation based on initial offset and the changing hand position.
                 var globalHandTransform = GetTransformationMatrix(transform, true);
+
                 Matrix4x4 newTransformationMatrix = globalHandTransform * offsetMatrix;
 
                 // Get both the translation column and rotation and set them.
