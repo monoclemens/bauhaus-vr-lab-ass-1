@@ -6,17 +6,17 @@ public class Homer : MonoBehaviour
 {
     #region Member Variables
 
-    [Header("H.O.M.E.R. Components")] 
+    [Header("H.O.M.E.R. Components")]
     public Transform head;
     public float originHeadOffset = 0.2f;
     public Transform hand;
 
-    [Header("H.O.M.E.R. Parameters")] 
+    [Header("H.O.M.E.R. Parameters")]
     public LineRenderer ray;
     public float rayMaxLength = 100f;
     public LayerMask layerMask; // use this mask to raycast only for interactable objects
-    
-    [Header("Input Actions")] 
+
+    [Header("Input Actions")]
     public InputActionProperty grabAction;
 
     [Header("Grab Configuration")]
@@ -25,9 +25,9 @@ public class Homer : MonoBehaviour
     // grab calculation variables
     private GameObject grabbedObject;
     private Matrix4x4 offsetMatrix;
-    
+
     // utility bool to check if you can grab an object
-    private bool canGrab
+    private bool CanGrab
     {
         get
         {
@@ -36,12 +36,12 @@ public class Homer : MonoBehaviour
             return false;
         }
     }
-    
+
     // variables needed for hand offset calculation
     private RaycastHit hit;
     private float grabOffsetDistance;
     private float grabHandDistance;
-    
+
     // convenience variables for hand offset calculations
     private Vector3 origin
     {
@@ -65,7 +65,7 @@ public class Homer : MonoBehaviour
 
     private void Start()
     {
-        if(GetComponentInParent<NetworkObject>() != null)
+        if (GetComponentInParent<NetworkObject>() != null)
             if (!GetComponentInParent<NetworkObject>().IsOwner)
             {
                 Destroy(this);
@@ -77,6 +77,8 @@ public class Homer : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log("Update called in Homer.");
+
         if (grabbedObject == null)
             UpdateRay();
         else
@@ -108,7 +110,7 @@ public class Homer : MonoBehaviour
     }
 
     #endregion
-    
+
     #region Utility Functions
 
     public Matrix4x4 GetTransformationMatrix(Transform t, bool inWorldSpace = true)
