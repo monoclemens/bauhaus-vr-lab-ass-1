@@ -21,7 +21,7 @@ public class VirtualHand : MonoBehaviour
     [SerializeField] private VirtualHandsMethod grabMethod;
     public HandCollider handCollider;
 
-    // calculation variables
+    // Calculation variables
     private GameObject grabbedObject;
     private Matrix4x4 offsetMatrix;
 
@@ -93,7 +93,7 @@ public class VirtualHand : MonoBehaviour
             if (grabbedObject != null)
             {
                 grabbedObject.transform.SetPositionAndRotation(
-                    transform.position, 
+                    transform.position,
                     transform.rotation
                 );
             }
@@ -111,62 +111,82 @@ public class VirtualHand : MonoBehaviour
 
     private void ReparentingGrab()
     {
-        // TODO: your solution for excercise 3.4
-        // use this function to implement an object-grabbing that re-parents the object to the hand without snapping
+        // TODO: Your solution for excercise 3.4.
+        // Use this function to implement an object-grabbing that re-parents the object to the hand without snapping.
         if (grabAction.action.IsPressed())
         {
             if (grabbedObject == null && handCollider.isColliding && CanGrab)
             {
                 grabbedObject = handCollider.collidingObject;
-                //set the parent
+
+                // Set the parent.
+                // TODO: Is it really this simple?
                 grabbedObject.transform.SetParent(transform);
             }
-
         }
         else if (grabAction.action.WasReleasedThisFrame())
         {
-            if (grabbedObject != null)
-                grabbedObject.GetComponent<ManipulationSelector>().Release();
-            //reset the parent to null
+            if (grabbedObject != null) 
+            { 
+                grabbedObject.GetComponent<ManipulationSelector>().Release(); 
+            }
+
+            // Reset the parent to null.
+            // TODO: Will this cause issues with the object's transform? Does Unity do the heavy lifting once again?
             grabbedObject.transform.SetParent(null);
             grabbedObject = null;
-
         }
-
     }
-    //it snaps for some reason  even though we take into account the position offset
+
+    // TODO: It snaps for some reason, even though we take into account the position offset.
     private void CalculationGrab()
     {
-        // TODO: your solution for excercise 3.4
-        // use this function to implement an object-grabbing that uses an offset calculation without snapping (and no re-parenting!)
+        // TODO: your solution for excercise 3.4.
+        // Use this function to implement an object-grabbing that uses an offset calculation without snapping (and no re-parenting!)
         if (grabAction.action.IsPressed())
         {
-
+            // Initial grab if there is no grabbed object yet.
             if (grabbedObject == null && handCollider.isColliding && CanGrab)
             {
                 grabbedObject = handCollider.collidingObject;
-                //get the initial offset from the object to the hand
-                offsetMatrix = GetTransformationMatrix(transform, true).inverse * GetTransformationMatrix(grabbedObject.transform, true);
+
+                // Get the hand's global transform and inverse it.
+                var globalHandTransformationMatrix = GetTransformationMatrix(transform, true);
+                var inverseGlobalHandTransformationMatrix = globalHandTransformationMatrix.inverse;
+
+                // Get the grabbed object's global transform.
+                var globalGrabbedObjectTransformationMatrix = GetTransformationMatrix(grabbedObject.transform, true);
+
+                // Multiply both transform matrixes to get the initial offset matrix.
+                offsetMatrix = globalGrabbedObjectTransformationMatrix * inverseGlobalHandTransformationMatrix;
             }
+
+            // Calculate the grabbed object's transform whenever there is a grabbed object.
             if (grabbedObject != null)
             {
-                //calculate the new transformation based on initial offset and the changing hand position
-                Matrix4x4 newTransformationMatrix = GetTransformationMatrix(transform, true) * offsetMatrix;
-                //get the translation column and rotation and set them
-                grabbedObject.transform.position = newTransformationMatrix.GetColumn(3);
-                grabbedObject.transform.rotation = Quaternion.LookRotation(newTransformationMatrix.GetColumn(2), newTransformationMatrix.GetColumn(1));
+                // Calculate the new transformation based on initial offset and the changing hand position.
+                var globalHandTransform = GetTransformationMatrix(transform, true);
+                Matrix4x4 newTransformationMatrix = globalHandTransform * offsetMatrix;
 
+                // Get both the translation column and rotation and set them.
+                grabbedObject.transform.SetPositionAndRotation(
+                    newTransformationMatrix.GetColumn(3), 
+                    Quaternion.LookRotation(
+                        newTransformationMatrix.GetColumn(2), 
+                        newTransformationMatrix.GetColumn(1)
+                    )
+                );
             }
         }
         else if (grabAction.action.WasReleasedThisFrame())
         {
             if (grabbedObject != null)
+            {
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
+            }
+
             grabbedObject = null;
-
         }
-
-
     }
 
     #endregion
@@ -190,7 +210,9 @@ public class VirtualHand : MonoBehaviour
         get
         {
             if (handCollider.isColliding == false)
+            {
                 return false;
+            }
 
             bool isAllowedToGrab = handCollider
                 .collidingObject
