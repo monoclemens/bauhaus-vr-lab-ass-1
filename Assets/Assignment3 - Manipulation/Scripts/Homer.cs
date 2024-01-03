@@ -32,7 +32,10 @@ public class Homer : MonoBehaviour
         get
         {
             if (handCollider.isColliding)
+            {
                 return handCollider.collidingObject.GetComponent<ManipulationSelector>().RequestGrab();
+            }
+
             return false;
         }
     }
@@ -43,7 +46,7 @@ public class Homer : MonoBehaviour
     private float grabHandDistance;
 
     // convenience variables for hand offset calculations
-    private Vector3 origin
+    private Vector3 Origin
     {
         get
         {
@@ -52,7 +55,7 @@ public class Homer : MonoBehaviour
             return v;
         }
     }
-    private Vector3 direction => hand.position - origin;
+    private Vector3 Direction => hand.position - Origin;
 
     #endregion
 
@@ -69,6 +72,7 @@ public class Homer : MonoBehaviour
             if (!GetComponentInParent<NetworkObject>().IsOwner)
             {
                 Destroy(this);
+
                 return;
             }
 
@@ -77,8 +81,6 @@ public class Homer : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log("Update called in Homer.");
-
         if (grabbedObject == null)
             UpdateRay();
         else
@@ -91,10 +93,27 @@ public class Homer : MonoBehaviour
 
     #region Custom Methods
 
+    private void DrawRay ()
+    {
+        var positions = new Vector3[2];
+
+        positions[0] = Origin;
+        positions[1] = Direction * rayMaxLength;
+
+        ray.SetPositions(positions);
+    }
+
     private void UpdateRay()
     {
-        //TODO: your solution for excercise 3.5
+        // TODO: your solution for excercise 3.5
         // use this function to calculate and adjust the ray of the h.o.m.e.r. technique
+
+        DrawRay();
+
+        if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask))
+        {
+            Debug.Log("Hit something!");
+        }
     }
 
     private void ApplyHandOffset()
