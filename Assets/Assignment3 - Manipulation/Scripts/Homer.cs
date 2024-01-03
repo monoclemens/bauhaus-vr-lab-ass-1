@@ -122,18 +122,22 @@ public class Homer : MonoBehaviour
         // TODO: your solution for excercise 3.5
         // use this function to calculate the grabbing of an object
 
-        // Cast an invisible ray to see if we hit anything.
-        if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask))
+        if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask) && grabbedObject == null)
         {
-            Debug.Log("Hit something!");
+            // Make the ray yellow if there is a hit.
+            ray.startColor = Color.yellow;
+            ray.endColor = Color.yellow;
 
-            // Make the ray red if there is a hit.
-            ray.startColor = Color.red;
-            ray.endColor = Color.red;
+            if (grabAction.action.WasPressedThisFrame())
+            {
+                // Make the ray yellow if there is a hit.
+                ray.startColor = Color.red;
+                ray.endColor = Color.red;
 
-            // Store a reference to the hit object (the cube).
-            grabbedObject = hit.collider.gameObject;
-        } else
+                // Store a reference to the hit object (the cube).
+                grabbedObject = hit.collider.gameObject;
+            }
+        } else if (grabAction.action.WasReleasedThisFrame())
         {
             // If there's no hit, just recolor the ray again, back to white.
             ray.startColor = Color.white;
@@ -141,7 +145,13 @@ public class Homer : MonoBehaviour
 
             // And reset the grabbed object reference.
             grabbedObject = null;
+        } else if (grabbedObject == null)
+        {
+            // If there's no grabbed object, just recolor the ray again, back to white.
+            ray.startColor = Color.white;
+            ray.endColor = Color.white;
         }
+        
     }
 
     #endregion
