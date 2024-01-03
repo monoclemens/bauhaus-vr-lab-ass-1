@@ -109,11 +109,6 @@ public class Homer : MonoBehaviour
         // use this function to calculate and adjust the ray of the h.o.m.e.r. technique
 
         DrawRay();
-
-        if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask))
-        {
-            Debug.Log("Hit something!");
-        }
     }
 
     private void ApplyHandOffset()
@@ -126,6 +121,27 @@ public class Homer : MonoBehaviour
     {
         // TODO: your solution for excercise 3.5
         // use this function to calculate the grabbing of an object
+
+        // Cast an invisible ray to see if we hit anything.
+        if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask))
+        {
+            Debug.Log("Hit something!");
+
+            // Make the ray red if there is a hit.
+            ray.startColor = Color.red;
+            ray.endColor = Color.red;
+
+            // Store a reference to the hit object (the cube).
+            grabbedObject = hit.collider.gameObject;
+        } else
+        {
+            // If there's no hit, just recolor the ray again, back to white.
+            ray.startColor = Color.white;
+            ray.endColor = Color.white;
+
+            // And reset the grabbed object reference.
+            grabbedObject = null;
+        }
     }
 
     #endregion
