@@ -148,14 +148,6 @@ public class VirtualHand : MonoBehaviour
         }
     }
 
-    /** TODO: It snaps for some reason, even though we take into account the position offset.
-     * 
-     * Note: Both the position and rotation of the hand are just added to the object, 
-     * like simply overriding it.
-     * 
-     * Note2: It looks like object is transforming with the hand being the origin. Also, the further away we are from the world origin,
-     * the further away the object is from our hand.
-     */
     private void CalculationGrab()
     {
         Debug.Log("CalculationGrab");
