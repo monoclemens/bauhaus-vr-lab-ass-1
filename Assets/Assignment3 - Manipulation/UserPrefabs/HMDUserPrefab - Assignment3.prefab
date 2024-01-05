@@ -572,7 +572,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3839371122037013567}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de649cc688c203f48ad8a5354a365602, type: 3}
   m_Name: 
@@ -2068,7 +2068,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7623515097068787712}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de649cc688c203f48ad8a5354a365602, type: 3}
   m_Name: 
@@ -2114,7 +2114,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7623515097068787712}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea473886d0515ab46a8475293954bd21, type: 3}
   m_Name: 
@@ -2122,8 +2122,8 @@ MonoBehaviour:
   head: {fileID: 7216047633375872280}
   originHeadOffset: 0.2
   hand: {fileID: 2679059498078427805}
-  distanceThreshold: 0.6
-  k: 0.16666667
+  distanceThreshold: 0.3
+  k: 0.515
   grabAction:
     m_UseReference: 1
     m_Action:
