@@ -48,7 +48,12 @@ public class Homer : MonoBehaviour
         }
     }
 
-    // variables needed for hand offset calculation
+    /**
+     * Variables needed for hand offset calculation.
+     * 
+     * grabOffsetDistance refers to the distance between origin and object.
+     * grabHandDistance refers to the distance between origin and hand.
+     */
     private RaycastHit hit;
     private float grabOffsetDistance;
     private float grabHandDistance;
@@ -63,6 +68,7 @@ public class Homer : MonoBehaviour
             return v;
         }
     }
+
     private Vector3 Direction => hand.position - Origin;
 
     #endregion
@@ -94,6 +100,7 @@ public class Homer : MonoBehaviour
         else
             ApplyHandOffset();
 
+        UpdateRay();
         GrabCalculation();
     }
 
@@ -123,6 +130,17 @@ public class Homer : MonoBehaviour
     {
         //TODO: your solution for excercise 3.5
         // use this function to calculate and adjust the hand as described in the h.o.m.e.r. technique
+
+        // Compute the current distance between origin and hand.
+        float currentHandOriginDistance = Vector3.Distance(Origin, hand.transform.position);
+
+        // Compute the relation between this current distance and the initial distance, which was stored when grabbing the object.
+        float relativeHandBodyDistance = currentHandOriginDistance / grabHandDistance;
+
+        // Now use that relation to compute the current distance between origin and object.
+        float currentObjectOriginDistance = grabOffsetDistance * relativeHandBodyDistance;
+
+
     }
 
     private GrabState ComputeGrabState()
@@ -139,6 +157,9 @@ public class Homer : MonoBehaviour
             // If the action is pressed, the user is grabbing the object. 
             if (grabAction.action.IsPressed())
             {
+                // Move the virtual hand to the object.
+                hand.position = hit.point;
+
                 return GrabState.Grab;
             }
 
@@ -181,11 +202,28 @@ public class Homer : MonoBehaviour
 
         if (grabState == GrabState.Grab)
         {
-            grabbedObject = hit.collider.gameObject;
+            if (grabbedObject == null) 
+            {
+                grabbedObject = hit.collider.gameObject;
+                grabbedObject.transform.SetParent(hand.transform);
+            }
+
+            /**
+             * If we just grabbed the object, remember the distance between 
+             *      - the user's origin and the hit point &
+             *      - the user's origin and their hand.
+             */
+            if (grabAction.action.WasPressedThisFrame())
+            {
+                grabOffsetDistance = hit.distance;
+                grabHandDistance = Vector3.Distance(Origin, hand.transform.position);
+            }
         }
         else
         {
             grabbedObject = null;
+
+            grabbedObject.transform.SetParent(null);
         }
     }
 
