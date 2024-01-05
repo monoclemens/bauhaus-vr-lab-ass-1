@@ -151,6 +151,13 @@ public class Homer : MonoBehaviour
             return GrabState.Grab;
         }
 
+        // If we release the object, reset its parent and remove the reference to it.
+        if (grabbedObject != null && grabAction.action.WasReleasedThisFrame())
+        {
+            grabbedObject.transform.SetParent(null);
+            grabbedObject = null;
+        }
+
         // Check if there is a hit.
         if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask))
         {
@@ -158,7 +165,7 @@ public class Homer : MonoBehaviour
             if (grabAction.action.IsPressed())
             {
                 // Move the virtual hand to the object.
-                hand.position = hit.point;
+                // hand.transform.position = hit.point;
 
                 return GrabState.Grab;
             }
@@ -202,7 +209,7 @@ public class Homer : MonoBehaviour
 
         if (grabState == GrabState.Grab)
         {
-            if (grabbedObject == null) 
+            if (grabbedObject == null)
             {
                 grabbedObject = hit.collider.gameObject;
                 grabbedObject.transform.SetParent(hand.transform);
@@ -221,9 +228,12 @@ public class Homer : MonoBehaviour
         }
         else
         {
-            grabbedObject = null;
+            if (grabbedObject != null)
+            {
+                grabbedObject.transform.SetParent(null);
+            }
 
-            grabbedObject.transform.SetParent(null);
+            grabbedObject = null;
         }
     }
 
