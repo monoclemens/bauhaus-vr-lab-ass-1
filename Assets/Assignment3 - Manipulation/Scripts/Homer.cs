@@ -237,6 +237,7 @@ public class Homer : MonoBehaviour
             }
 
             grabbedObject = null;
+            transform.position = hand.position;
         }
     }
 
