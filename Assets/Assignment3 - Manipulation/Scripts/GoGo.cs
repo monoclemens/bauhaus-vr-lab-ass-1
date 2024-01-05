@@ -6,31 +6,35 @@ public class GoGo : MonoBehaviour
 {
     #region Member Variables
 
-    [Header("Go-Go Components")] 
+    [Header("Go-Go Components")]
     public Transform head;
     public float originHeadOffset = 0.2f;
     public Transform hand;
 
-    [Header("Go-Go Parameters")] 
+    [Header("Go-Go Parameters")]
     public float distanceThreshold;
     [Range(0, 1)] public float k;
-    
-    [Header("Input Actions")] 
+
+    [Header("Input Actions")]
     public InputActionProperty grabAction;
-    
+
     [Header("Grab Configuration")]
     public HandCollider handCollider;
-    
+
     // calculation variables
     private GameObject grabbedObject;
-    private Matrix4x4 offsetMatrix;
-    
-    private bool canGrab
+    private GameObject lastCollidedObject;
+
+    private bool CanGrab
     {
         get
         {
             if (handCollider.isColliding)
+            {
+                lastCollidedObject = handCollider.collidingObject;
+
                 return handCollider.collidingObject.GetComponent<ManipulationSelector>().RequestGrab();
+            }
             return false;
         }
     }
@@ -41,7 +45,7 @@ public class GoGo : MonoBehaviour
 
     private void Start()
     {
-        if(GetComponentInParent<NetworkObject>() != null)
+        if (GetComponentInParent<NetworkObject>() != null)
             if (!GetComponentInParent<NetworkObject>().IsOwner)
             {
                 Destroy(this);
@@ -96,6 +100,47 @@ public class GoGo : MonoBehaviour
     {
         // TODO: your solution for excercise 3.6
         // use this function to calculate the grabbing of an object
+
+        if (grabAction.action.IsPressed())
+        {
+            if (grabbedObject == null && handCollider.isColliding && CanGrab)
+            {
+                grabbedObject = handCollider.collidingObject;
+                grabbedObject.transform.SetParent(transform);
+            }
+        }
+        else if (grabAction.action.WasReleasedThisFrame())
+        {
+            if (grabbedObject != null)
+            {
+                var grabbedObjectRenderer = grabbedObject.GetComponent<Renderer>();
+                grabbedObjectRenderer.material.SetColor("_Color", Color.white);
+
+                grabbedObject.GetComponent<ManipulationSelector>().Release();
+            }
+
+            grabbedObject.transform.SetParent(null);
+            grabbedObject = null;
+
+        }
+
+        if (CanGrab && grabbedObject == null)
+        {
+            var hoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
+            hoveredObjectRenderer.material.SetColor("_Color", Color.yellow);
+        }
+
+        if (grabbedObject != null)
+        {
+            var grabbedObjectRenderer = grabbedObject.GetComponent<Renderer>();
+            grabbedObjectRenderer.material.SetColor("_Color", Color.red);
+        }
+
+        if (grabbedObject == null && !CanGrab && lastCollidedObject != null)
+        {
+            var unhoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
+            unhoveredObjectRenderer.material.SetColor("_Color", Color.white);
+        }
     }
 
     #endregion
