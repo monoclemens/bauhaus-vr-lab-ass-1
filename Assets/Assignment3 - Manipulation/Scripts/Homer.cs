@@ -2,6 +2,11 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+enum GrabState
+{
+    Idle, Hit, Grab
+}
+
 public class Homer : MonoBehaviour
 {
     #region Member Variables
@@ -25,6 +30,9 @@ public class Homer : MonoBehaviour
     // grab calculation variables
     private GameObject grabbedObject;
     private Matrix4x4 offsetMatrix;
+
+    // Added by Clay to keep track of the grab state.
+    private GrabState grabState = GrabState.Idle;
 
     // utility bool to check if you can grab an object
     private bool CanGrab
@@ -93,7 +101,7 @@ public class Homer : MonoBehaviour
 
     #region Custom Methods
 
-    private void DrawRay ()
+    private void DrawRay()
     {
         var positions = new Vector3[2];
 
@@ -117,41 +125,68 @@ public class Homer : MonoBehaviour
         // use this function to calculate and adjust the hand as described in the h.o.m.e.r. technique
     }
 
+    private GrabState ComputeGrabState()
+    {
+        // If there is a grabbed object already and if the action button is pressed, just keep grabbing.
+        if (grabbedObject != null && grabAction.action.IsPressed())
+        {
+            return GrabState.Grab;
+        }
+
+        // Check if there is a hit.
+        if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask))
+        {
+            // If the action is pressed, the user is grabbing the object. 
+            if (grabAction.action.IsPressed())
+            {
+                return GrabState.Grab;
+            }
+
+            // Otherwise there is only a hit.
+            return GrabState.Hit;
+        }
+
+        return GrabState.Idle;
+    }
+
+    private void ColorRay(GrabState grabState)
+    {
+        switch (grabState)
+        {
+            case GrabState.Idle:
+                ray.startColor = Color.white;
+                ray.endColor = Color.white;
+                break;
+            case GrabState.Hit:
+                ray.startColor = Color.green;
+                ray.endColor = Color.green;
+                break;
+            case GrabState.Grab:
+                ray.startColor = Color.blue;
+                ray.endColor = Color.blue;
+                break;
+        }
+    }
+
     private void GrabCalculation()
     {
         // TODO: your solution for excercise 3.5
         // use this function to calculate the grabbing of an object
 
-        if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask) && grabbedObject == null)
-        {
-            // Make the ray yellow if there is a hit.
-            ray.startColor = Color.yellow;
-            ray.endColor = Color.yellow;
+        // Get the current state of the grab.
+        grabState = ComputeGrabState();
 
-            if (grabAction.action.WasPressedThisFrame())
-            {
-                // Make the ray yellow if there is a hit.
-                ray.startColor = Color.red;
-                ray.endColor = Color.red;
+        // Color the ray accordingly.
+        ColorRay(grabState);
 
-                // Store a reference to the hit object (the cube).
-                grabbedObject = hit.collider.gameObject;
-            }
-        } else if (grabAction.action.WasReleasedThisFrame())
+        if (grabState == GrabState.Grab)
         {
-            // If there's no hit, just recolor the ray again, back to white.
-            ray.startColor = Color.white;
-            ray.endColor = Color.white;
-
-            // And reset the grabbed object reference.
-            grabbedObject = null;
-        } else if (grabbedObject == null)
-        {
-            // If there's no grabbed object, just recolor the ray again, back to white.
-            ray.startColor = Color.white;
-            ray.endColor = Color.white;
+            grabbedObject = hit.collider.gameObject;
         }
-        
+        else
+        {
+            grabbedObject = null;
+        }
     }
 
     #endregion
