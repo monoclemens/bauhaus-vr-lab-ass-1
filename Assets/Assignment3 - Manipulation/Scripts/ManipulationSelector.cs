@@ -25,7 +25,7 @@ public class ManipulationSelector : NetworkBehaviour
         }
 
         ChangeOwnershipServerRpc();
-        UpdateGrabbedStateClientRpc();
+        UpdateGrabbedStateServerRpc();
 
         // Not sure about this return statement. I suppose it's correct, but it seems too simple.
         return true;
@@ -36,7 +36,7 @@ public class ManipulationSelector : NetworkBehaviour
         // TODO: your solution for excercise 3.8
         // use this function trigger a grabbed state update on object release
 
-        UpdateGrabbedStateClientRpc();
+        UpdateGrabbedStateServerRpc();
     }
 
     #endregion
@@ -56,7 +56,7 @@ public class ManipulationSelector : NetworkBehaviour
      * Docs on ServerRpc: https://docs-multiplayer.unity3d.com/netcode/current/advanced-topics/message-system/serverrpc/
      */
     [ServerRpc(RequireOwnership = false)]
-    public ulong? ChangeOwnershipServerRpc(ServerRpcParams serverRpcParams = default)
+    public void ChangeOwnershipServerRpc(ServerRpcParams serverRpcParams = default)
     {
         ulong clientId = serverRpcParams.Receive.SenderClientId;
         NetworkObject thisNetworkObject = GetComponent<NetworkObject>();
@@ -66,14 +66,12 @@ public class ManipulationSelector : NetworkBehaviour
         {
             thisNetworkObject.RemoveOwnership();
 
-            return null;
         }
         // Otherwise switch ownership to the requesting client's ID. Now they own it.
         else
         {
             thisNetworkObject.ChangeOwnership(clientId);
 
-            return clientId;
         }
     }
 
@@ -84,7 +82,7 @@ public class ManipulationSelector : NetworkBehaviour
      * It returns the new grabbed state's bool.
      */
     [ServerRpc]
-    public bool UpdateGrabbedStateClientRpc()
+    public void UpdateGrabbedStateServerRpc()
     {
         var nextIsGrabbed = !isGrabbed.Value;
         isGrabbed.Value = nextIsGrabbed;
@@ -96,7 +94,7 @@ public class ManipulationSelector : NetworkBehaviour
             thisNetworkObject.RemoveOwnership();
         }
 
-        return nextIsGrabbed;
+        
     }
 
     #endregion
