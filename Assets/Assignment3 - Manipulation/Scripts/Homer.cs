@@ -131,7 +131,7 @@ public class Homer : MonoBehaviour
         //TODO: your solution for excercise 3.5
         // use this function to calculate and adjust the hand as described in the h.o.m.e.r. technique
 
-        // Compute the current distance between origin and hand.
+        // Compute the current distance between origin and tracked hand.
         float currentHandOriginDistance = Vector3.Distance(Origin, hand.transform.position);
 
         // Compute the relation between this current distance and the initial distance, which was stored when grabbing the object.
@@ -140,7 +140,7 @@ public class Homer : MonoBehaviour
         // Now use that relation to compute the current distance between origin and object.
         float currentObjectOriginDistance = grabOffsetDistance * relativeHandBodyDistance;
 
-
+        transform.position *= currentObjectOriginDistance;
     }
 
     private GrabState ComputeGrabState()
@@ -162,10 +162,10 @@ public class Homer : MonoBehaviour
         if (Physics.Raycast(Origin, Direction, out hit, rayMaxLength, layerMask))
         {
             // If the action is pressed, the user is grabbing the object. 
-            if (grabAction.action.IsPressed())
+            if (grabAction.action.WasPressedThisFrame())
             {
                 // Move the virtual hand to the object.
-                // hand.transform.position = hit.point;
+                transform.position = hit.point;
 
                 return GrabState.Grab;
             }
@@ -212,7 +212,7 @@ public class Homer : MonoBehaviour
             if (grabbedObject == null)
             {
                 grabbedObject = hit.collider.gameObject;
-                grabbedObject.transform.SetParent(hand.transform);
+                grabbedObject.transform.SetParent(transform);
             }
 
             /**
