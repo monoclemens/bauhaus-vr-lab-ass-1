@@ -128,7 +128,7 @@ public class Homer : MonoBehaviour
 
     private void ApplyHandOffset()
     {
-        //TODO: your solution for excercise 3.5
+        // TODO: your solution for excercise 3.5
         // use this function to calculate and adjust the hand as described in the h.o.m.e.r. technique
 
         // Compute the current distance between origin and tracked hand.
@@ -140,7 +140,10 @@ public class Homer : MonoBehaviour
         // Now use that relation to compute the current distance between origin and object.
         float currentObjectOriginDistance = grabOffsetDistance * relativeHandBodyDistance;
 
-        transform.position *= currentObjectOriginDistance;
+        Ray tempRay = new Ray(Origin, Direction);
+        var newPosition = tempRay.GetPoint(currentObjectOriginDistance);
+
+        transform.position = newPosition;
     }
 
     private GrabState ComputeGrabState()
