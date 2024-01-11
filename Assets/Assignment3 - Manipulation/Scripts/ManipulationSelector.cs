@@ -14,8 +14,7 @@ public class ManipulationSelector : NetworkBehaviour
 
     public bool RequestGrab()
     {
-        Debug.Log("RequestGrab!");
-
+        // Debug.Log("RequestGrab!");
         // TODO: your solution for excercise 3.8
         // check if object can be grabbed by a user
         // trigger ownership handling
@@ -36,7 +35,7 @@ public class ManipulationSelector : NetworkBehaviour
 
     public void Release()
     {
-        Debug.Log("Release!");
+        //Debug.Log("Release!");
 
         // TODO: your solution for excercise 3.8
         // use this function trigger a grabbed state update on object release
@@ -63,19 +62,19 @@ public class ManipulationSelector : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void ChangeOwnershipServerRpc(ServerRpcParams serverRpcParams = default)
     {
-        Debug.Log("ChangeOwnershipServerRpc!");
+        //Debug.Log("ChangeOwnershipServerRpc!");
 
         ulong clientId = serverRpcParams.Receive.SenderClientId;
 
-        Debug.Log("clientID: " + clientId);
+        //Debug.Log("clientID: " + clientId);
 
         NetworkObject thisNetworkObject = GetComponent<NetworkObject>();
 
-        Debug.Log("current owner id: " + thisNetworkObject.OwnerClientId);
+        //Debug.Log("current owner id: " + thisNetworkObject.OwnerClientId);
 
         thisNetworkObject.ChangeOwnership(clientId);
 
-        Debug.Log("owner id after ChangeOwnershipServerRpc: " + thisNetworkObject.OwnerClientId);
+        //Debug.Log("owner id after ChangeOwnershipServerRpc: " + thisNetworkObject.OwnerClientId);
     }
 
     /**
@@ -103,7 +102,7 @@ public class ManipulationSelector : NetworkBehaviour
             NetworkObject thisNetworkObject = GetComponent<NetworkObject>();
             thisNetworkObject.RemoveOwnership();
 
-            Debug.Log("owner id after UpdateGrabbedStateServerRpc: " + thisNetworkObject.OwnerClientId);
+            //Debug.Log("owner id after UpdateGrabbedStateServerRpc: " + thisNetworkObject.OwnerClientId);
         }
 
 

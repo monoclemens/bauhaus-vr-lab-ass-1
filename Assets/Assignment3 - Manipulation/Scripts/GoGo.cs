@@ -52,7 +52,7 @@ public class GoGo : MonoBehaviour
                 return;
             }
 
-        k = 0.9f;
+        k = 5;
     }
 
     private void Update()
@@ -73,10 +73,10 @@ public class GoGo : MonoBehaviour
 
         float distanceDelta = TrackedHandOriginDistance - distanceThreshold;
 
-        Debug.Log("Origin: " + Origin);
+        /*Debug.Log("Origin: " + Origin);
         Debug.Log("Distance: " + TrackedHandOriginDistance);
         Debug.Log("Delta: " + distanceDelta);
-        Debug.Log("k: " + k);
+        Debug.Log("k: " + k);*/
 
         // Do nothing underneath the threshold.
         if (distanceDelta < 0)
@@ -84,16 +84,15 @@ public class GoGo : MonoBehaviour
             return;
         }
 
-        Debug.Log("Delta is over threshold!");
+        //Debug.Log("Delta is over threshold!");
 
         float squaredDistanceDelta = distanceDelta * distanceDelta;
 
         float nonIsomorphicFactor = k * squaredDistanceDelta;
 
-        Debug.Log("Factor: " + nonIsomorphicFactor + "; TrackedHandOriginDistance: " + TrackedHandOriginDistance);
 
         // Now move the virtual hand to where the tracked one is PLUS the additional distance.
-        transform.position = hand.transform.position + hand.transform.position * nonIsomorphicFactor;
+        transform.position = hand.transform.position + hand.transform.forward * nonIsomorphicFactor;
     }
 
     private void GrabCalculation()
@@ -107,9 +106,13 @@ public class GoGo : MonoBehaviour
             {
                 grabbedObject = handCollider.collidingObject;
                 grabbedObject.transform.SetParent(transform);
+
+                var grabbedObjectRenderer = grabbedObject.GetComponent<Renderer>();
+                grabbedObjectRenderer.material.SetColor("_Color", Color.red);
             }
         }
         else if (grabAction.action.WasReleasedThisFrame())
+
         {
             if (grabbedObject != null)
             {
@@ -117,30 +120,41 @@ public class GoGo : MonoBehaviour
                 grabbedObjectRenderer.material.SetColor("_Color", Color.white);
 
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
+                grabbedObject.transform.SetParent(null);
             }
 
-            grabbedObject.transform.SetParent(null);
+            
             grabbedObject = null;
 
         }
-
-        if (CanGrab && grabbedObject == null)
+        else if (handCollider.isColliding)
         {
             var hoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
             hoveredObjectRenderer.material.SetColor("_Color", Color.yellow);
         }
-
-        if (grabbedObject != null)
-        {
-            var grabbedObjectRenderer = grabbedObject.GetComponent<Renderer>();
-            grabbedObjectRenderer.material.SetColor("_Color", Color.red);
-        }
-
-        if (grabbedObject == null && !CanGrab && lastCollidedObject != null)
+        else if (lastCollidedObject != null)
         {
             var unhoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
             unhoveredObjectRenderer.material.SetColor("_Color", Color.white);
         }
+
+
+        /*f (CanGrab && grabbedObject == null)
+         {
+             var hoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
+             hoveredObjectRenderer.material.SetColor("_Color", Color.yellow);
+         }
+
+         if (grabbedObject != null)
+         {
+
+         }
+
+         if (grabbedObject == null && !CanGrab && lastCollidedObject != null)
+         {
+             var unhoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
+             unhoveredObjectRenderer.material.SetColor("_Color", Color.white);
+         }*/
     }
 
     #endregion

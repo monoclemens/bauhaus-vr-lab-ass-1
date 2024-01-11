@@ -95,7 +95,6 @@ public class Homer : MonoBehaviour
 
     private void Update()
     {
-        if (CanGrab) { }
         if (grabbedObject == null)
             UpdateRay();
         else
@@ -234,6 +233,7 @@ public class Homer : MonoBehaviour
         {
             if (grabbedObject != null)
             {
+                grabbedObject.GetComponent<ManipulationSelector>().Release();
                 grabbedObject.transform.SetParent(null);
             }
 
