@@ -95,6 +95,7 @@ public class Homer : MonoBehaviour
 
     private void Update()
     {
+        if (CanGrab) { }
         if (grabbedObject == null)
             UpdateRay();
         else
