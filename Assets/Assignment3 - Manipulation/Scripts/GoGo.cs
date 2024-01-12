@@ -92,7 +92,7 @@ public class GoGo : MonoBehaviour
 
 
         // Now move the virtual hand to where the tracked one is PLUS the additional distance.
-        transform.position = hand.transform.position + hand.transform.forward * nonIsomorphicFactor;
+        transform.position = hand.transform.position + hand.transform.position * nonIsomorphicFactor;
     }
 
     private void GrabCalculation()
