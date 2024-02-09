@@ -6,35 +6,31 @@ public class GoGo : MonoBehaviour
 {
     #region Member Variables
 
-    [Header("Go-Go Components")]
+    [Header("Go-Go Components")] 
     public Transform head;
     public float originHeadOffset = 0.2f;
     public Transform hand;
 
-    [Header("Go-Go Parameters")]
+    [Header("Go-Go Parameters")] 
     public float distanceThreshold;
     [Range(0, 1)] public float k;
-
-    [Header("Input Actions")]
+    
+    [Header("Input Actions")] 
     public InputActionProperty grabAction;
-
+    
     [Header("Grab Configuration")]
     public HandCollider handCollider;
-
+    
     // calculation variables
     private GameObject grabbedObject;
-    private GameObject lastCollidedObject;
-
-    private bool CanGrab
+    private Matrix4x4 offsetMatrix;
+    
+    private bool canGrab
     {
         get
         {
             if (handCollider.isColliding)
-            {
-                lastCollidedObject = handCollider.collidingObject;
-
                 return handCollider.collidingObject.GetComponent<ManipulationSelector>().RequestGrab();
-            }
             return false;
         }
     }
@@ -45,20 +41,17 @@ public class GoGo : MonoBehaviour
 
     private void Start()
     {
-        if (GetComponentInParent<NetworkObject>() != null)
+        if(GetComponentInParent<NetworkObject>() != null)
             if (!GetComponentInParent<NetworkObject>().IsOwner)
             {
                 Destroy(this);
                 return;
             }
-
-        k = 5;
     }
 
     private void Update()
     {
         ApplyHandOffset();
-
         GrabCalculation();
     }
 
@@ -68,93 +61,56 @@ public class GoGo : MonoBehaviour
 
     private void ApplyHandOffset()
     {
-        // TODO: your solution for excercise 3.6
-        // use this function to calculate and apply the hand displacement according to the go-go technique
+        Vector3 origin = head.position;
+        origin.y -= originHeadOffset;
 
-        float distanceDelta = TrackedHandOriginDistance - distanceThreshold;
+        float distance = Vector3.Distance(origin, hand.position);
 
-        /*Debug.Log("Origin: " + Origin);
-        Debug.Log("Distance: " + TrackedHandOriginDistance);
-        Debug.Log("Delta: " + distanceDelta);
-        Debug.Log("k: " + k);*/
-
-        // Do nothing underneath the threshold.
-        if (distanceDelta < 0)
+        if (distance < distanceThreshold)
         {
-            return;
+            transform.position = hand.position;
         }
-
-        //Debug.Log("Delta is over threshold!");
-
-        float squaredDistanceDelta = distanceDelta * distanceDelta;
-
-        float nonIsomorphicFactor = k * squaredDistanceDelta;
-
-
-        // Now move the virtual hand to where the tracked one is PLUS the additional distance.
-        transform.position = hand.transform.position + hand.transform.position * nonIsomorphicFactor;
+        else
+        {
+            Vector3 direction = hand.position - origin;
+            
+            float offsetDistance = k * Mathf.Pow((direction.magnitude - distanceThreshold) * 100, 2);
+            offsetDistance = direction.magnitude + offsetDistance / 100;
+            
+            transform.position = origin + direction.normalized * offsetDistance;
+        }
+        
+        transform.rotation = hand.rotation;
     }
 
     private void GrabCalculation()
     {
-        // TODO: your solution for excercise 3.6
-        // use this function to calculate the grabbing of an object
-
-        if (grabAction.action.IsPressed())
+        if (grabAction.action.WasPressedThisFrame())
         {
-            if (grabbedObject == null && handCollider.isColliding && CanGrab)
+            if (grabbedObject == null && handCollider.isColliding && canGrab)
             {
                 grabbedObject = handCollider.collidingObject;
-                grabbedObject.transform.SetParent(transform);
-
-                var grabbedObjectRenderer = grabbedObject.GetComponent<Renderer>();
-                grabbedObjectRenderer.material.SetColor("_Color", Color.red);
+                offsetMatrix = GetTransformationMatrix(transform, true).inverse *
+                               GetTransformationMatrix(grabbedObject.transform, true);
             }
         }
-        else if (grabAction.action.WasReleasedThisFrame())
-
+        else if (grabAction.action.IsPressed())
         {
             if (grabbedObject != null)
             {
-                var grabbedObjectRenderer = grabbedObject.GetComponent<Renderer>();
-                grabbedObjectRenderer.material.SetColor("_Color", Color.white);
+                Matrix4x4 newTransform = GetTransformationMatrix(transform, true) * offsetMatrix;
 
-                grabbedObject.GetComponent<ManipulationSelector>().Release();
-                grabbedObject.transform.SetParent(null);
+                grabbedObject.transform.position = newTransform.GetColumn(3);
+                grabbedObject.transform.rotation = newTransform.rotation;
             }
-
-            
+        }
+        else if (grabAction.action.WasReleasedThisFrame())
+        {
+            if(grabbedObject != null)
+                grabbedObject.GetComponent<ManipulationSelector>().Release();
             grabbedObject = null;
-
+            offsetMatrix = Matrix4x4.identity;
         }
-        else if (handCollider.isColliding)
-        {
-            var hoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
-            hoveredObjectRenderer.material.SetColor("_Color", Color.yellow);
-        }
-        else if (lastCollidedObject != null)
-        {
-            var unhoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
-            unhoveredObjectRenderer.material.SetColor("_Color", Color.white);
-        }
-
-
-        /*f (CanGrab && grabbedObject == null)
-         {
-             var hoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
-             hoveredObjectRenderer.material.SetColor("_Color", Color.yellow);
-         }
-
-         if (grabbedObject != null)
-         {
-
-         }
-
-         if (grabbedObject == null && !CanGrab && lastCollidedObject != null)
-         {
-             var unhoveredObjectRenderer = lastCollidedObject.GetComponent<Renderer>();
-             unhoveredObjectRenderer.material.SetColor("_Color", Color.white);
-         }*/
     }
 
     #endregion
@@ -173,26 +129,5 @@ public class GoGo : MonoBehaviour
         }
     }
 
-    private Vector3 Origin
-    {
-        get
-        {
-            var origin = head.position;
-            origin.y -= originHeadOffset;
-
-            return origin;
-        }
-    }
-
-    // The distance between the TRACKED hand and the origin of the user.
-    private float TrackedHandOriginDistance
-    {
-        get
-        {
-            var distance = Vector3.Distance(hand.position, Origin);
-
-            return distance;
-        }
-    }
     #endregion
 }

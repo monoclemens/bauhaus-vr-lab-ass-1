@@ -603,7 +603,7 @@ MonoBehaviour:
       m_Name: Toggle
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 10a4ff99-bf0d-4e2b-a4f1-c60ebfb05a04
+      m_Id: 05d72867-8e1d-4c16-a9d7-34c2c4e624a5
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -648,7 +648,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3839371122037013567}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5292fd0019b1f574ca2a25b50a444657, type: 3}
   m_Name: 
@@ -1619,7 +1619,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 110
+  field of view: 60
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -2068,7 +2068,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7623515097068787712}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de649cc688c203f48ad8a5354a365602, type: 3}
   m_Name: 
@@ -2099,7 +2099,7 @@ MonoBehaviour:
       m_Name: Toggle
       m_Type: 0
       m_ExpectedControlType: 
-      m_Id: 105efa4d-0c71-46c7-9024-00aa16ecec72
+      m_Id: 8e2a67e6-aa3b-418e-a431-8dbf70b84ad0
       m_Processors: 
       m_Interactions: 
       m_SingletonActionBindings: []
@@ -2122,8 +2122,8 @@ MonoBehaviour:
   head: {fileID: 7216047633375872280}
   originHeadOffset: 0.2
   hand: {fileID: 2679059498078427805}
-  distanceThreshold: 0.3
-  k: 0.515
+  distanceThreshold: 0.6
+  k: 0.16666667
   grabAction:
     m_UseReference: 1
     m_Action:
@@ -2144,7 +2144,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7623515097068787712}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5292fd0019b1f574ca2a25b50a444657, type: 3}
   m_Name: 
@@ -2177,7 +2177,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7623515097068787712}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

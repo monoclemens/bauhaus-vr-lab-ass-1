@@ -6,21 +6,21 @@ public class VirtualHand : MonoBehaviour
 {
     #region Member Variables
 
-    private enum VirtualHandsMethod
+    private enum VirtualHandsMethod 
     {
         Snap,
         Reparenting,
         Calculation
     }
 
-    [Header("Input Actions")]
+    [Header("Input Actions")] 
     public InputActionProperty grabAction;
     public InputActionProperty toggleAction;
 
     [Header("Configuration")]
     [SerializeField] private VirtualHandsMethod grabMethod;
     public HandCollider handCollider;
-
+    
     // calculation variables
     private GameObject grabbedObject;
     private Matrix4x4 offsetMatrix;
@@ -41,7 +41,7 @@ public class VirtualHand : MonoBehaviour
 
     private void Start()
     {
-        if (GetComponentInParent<NetworkObject>() != null)
+        if(GetComponentInParent<NetworkObject>() != null)
             if (!GetComponentInParent<NetworkObject>().IsOwner)
             {
                 Destroy(this);
@@ -55,7 +55,7 @@ public class VirtualHand : MonoBehaviour
         {
             grabMethod = (VirtualHandsMethod)(((int)grabMethod + 1) % 3);
         }
-
+        
         switch (grabMethod)
         {
             case VirtualHandsMethod.Snap:
@@ -91,7 +91,7 @@ public class VirtualHand : MonoBehaviour
         }
         else if (grabAction.action.WasReleasedThisFrame())
         {
-            if (grabbedObject != null)
+            if(grabbedObject != null)
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
             grabbedObject = null;
         }
@@ -99,62 +99,54 @@ public class VirtualHand : MonoBehaviour
 
     private void ReparentingGrab()
     {
-        // TODO: your solution for excercise 3.4
-        // use this function to implement an object-grabbing that re-parents the object to the hand without snapping
-        if (grabAction.action.IsPressed())
+        if (grabAction.action.WasPressedThisFrame())
         {
             if (grabbedObject == null && handCollider.isColliding && canGrab)
             {
                 grabbedObject = handCollider.collidingObject;
-                //set the parent
-                grabbedObject.transform.SetParent(transform);
+                grabbedObject.transform.SetParent(transform, true);
             }
-
         }
-        else if (grabAction.action.WasReleasedThisFrame())
+        else if(grabAction.action.WasReleasedThisFrame())
         {
             if (grabbedObject != null)
+            {
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
-            //reset the parent to null
-            grabbedObject.transform.SetParent(null);
+                grabbedObject.transform.SetParent(null, true);
+            }
+            
             grabbedObject = null;
-
         }
-
     }
-    //it snaps for some reason  even though we take into account the position offset
+
     private void CalculationGrab()
     {
-        // TODO: your solution for excercise 3.4
-        // use this function to implement an object-grabbing that uses an offset calculation without snapping (and no re-parenting!)
-        if (grabAction.action.IsPressed())
+        if (grabAction.action.WasPressedThisFrame())
         {
-
             if (grabbedObject == null && handCollider.isColliding && canGrab)
             {
                 grabbedObject = handCollider.collidingObject;
-                //get the initial offset from the object to the hand
-                offsetMatrix = GetTransformationMatrix(transform, true).inverse * GetTransformationMatrix(grabbedObject.transform, true);
+                offsetMatrix = GetTransformationMatrix(transform, true).inverse *
+                               GetTransformationMatrix(grabbedObject.transform, true);
             }
+        }
+        else if (grabAction.action.IsPressed())
+        {
             if (grabbedObject != null)
             {
-                //calculate the new transformation based on initial offset and the changing hand position
-                Matrix4x4 newTransformationMatrix = GetTransformationMatrix(transform, true) * offsetMatrix;
-                //get the translation column and rotation and set them
-                grabbedObject.transform.position = newTransformationMatrix.GetColumn(3);
-                grabbedObject.transform.rotation = Quaternion.LookRotation(newTransformationMatrix.GetColumn(2), newTransformationMatrix.GetColumn(1));
+                Matrix4x4 newTransform = GetTransformationMatrix(transform, true) * offsetMatrix;
 
+                grabbedObject.transform.position = newTransform.GetColumn(3);
+                grabbedObject.transform.rotation = newTransform.rotation;
             }
         }
         else if (grabAction.action.WasReleasedThisFrame())
         {
-            if (grabbedObject != null)
+            if(grabbedObject != null)
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
             grabbedObject = null;
-
+            offsetMatrix = Matrix4x4.identity;
         }
-
-
     }
 
     #endregion
