@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 4b423724c4892d6438d29cb37b373290
-timeCreated: 1486827100
+guid: d62ba206d6f3125429f5213d81c32eb0
+timeCreated: 1487074644
 licenseType: Store
 ModelImporter:
   serializedVersion: 19
@@ -9,7 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: light_wall_3
+    4300000: Cylinder_16_extended
   materials:
     importMaterials: 1
     materialName: 0
