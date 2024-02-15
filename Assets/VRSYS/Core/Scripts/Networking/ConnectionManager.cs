@@ -102,6 +102,14 @@ namespace VRSYS.Core.Networking
         //timer to start after the lobby is created
         private System.Diagnostics.Stopwatch lobbyTimer;
 
+        //audio source from which the sequences will be played
+        private AudioSource audioSource;
+
+        //initial seq audio path
+        private AudioClip audioPath;
+
+        
+
         
         #endregion
 
@@ -123,6 +131,12 @@ namespace VRSYS.Core.Networking
 
         private async void Start()
         {
+            //set audio source and set stereo
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.spatialBlend = 0f;
+            
+            audioPath = Resources.Load<AudioClip>("samples/initial_seq");
+            
             if (connectionState == ConnectionState.Offline)
             {
                 connectionState = ConnectionState.Connecting;
@@ -328,6 +342,7 @@ namespace VRSYS.Core.Networking
                 // Heartbeat the lobby every 15 seconds
                 StartCoroutine(HeartbeatLobbyCoroutine(lobby.Id, 15));
 
+                //to trigger the initial sequence
                 StartCoroutine(LogElapsedTimeCoroutine());
                 
                 // Relay & Lobby are set
@@ -366,6 +381,20 @@ namespace VRSYS.Core.Networking
                 yield return new WaitForSeconds(1); // Wait for 1 second
                 timeLeft = 30 - (int)lobbyTimer.Elapsed.TotalSeconds;
                 ExtendedLogger.LogInfo(GetType().Name, "First sequence will be played in: " + timeLeft.ToString());
+            }
+            PlayInitialSeq();
+        }
+
+        private void PlayInitialSeq()
+        {
+            if (audioPath != null)
+            {
+                audioSource.clip = audioPath;
+                audioSource.Play();
+            }
+            else
+            {
+                Debug.LogError("Audio clip not found. Make sure the file path is correct.");
             }
         }
         
