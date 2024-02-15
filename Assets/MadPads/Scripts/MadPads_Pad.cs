@@ -147,23 +147,30 @@ public class MadPads_Pad : NetworkBehaviour
         // Early return if it is already being touched.
         if (isTouched.Value) return;
 
-        PlayOnAllClientServerRpc(playerCollider);
+        PlayOnAllClientServerRpc(playerCollider.gameObject.name);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void PlayOnAllClientServerRpc (Collider playerCollider) {
+    public void PlayOnAllClientServerRpc (string playerGameObjectName) {
         // Set the bool now so all clients learn about the change.
         isTouched.Value = true;
 
-        // Let everyone know who touches the pad.
-        touchingPlayer.Value = playerCollider.gameObject;
+        GameObject collidingPlayer = GameObject.Find(playerGameObjectName);
+
+        Debug.Assert(collidingPlayer != null, "Could not find the colliding player '" + playerGameObjectName + "' by name. The player collided with pad " + gameObject.name + ".");
+
+        if (collidingPlayer != null)
+        {
+            // Let everyone know who touches the pad.
+            touchingPlayer.Value = collidingPlayer;
+        }
 
         // Now send the commands to be executed locally on the clients.
-        PlayOnAllClientsClientRpc(playerCollider);
+        PlayOnAllClientsClientRpc();
     }
 
     [ClientRpc]
-    public void PlayOnAllClientsClientRpc(Collider playerCollider)
+    public void PlayOnAllClientsClientRpc()
     {
         // Locally change the pads color for everyone.
         TogglePadColor();
