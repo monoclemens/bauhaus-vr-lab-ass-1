@@ -144,10 +144,23 @@ public class MadPads_Pad : NetworkBehaviour
     // This method will be executed when a player collides with the collider of the pad.
     private void OnTriggerEnter(Collider playerCollider)
     {
+        Debug.Log("Pad has been triggered!");
+
         // Early return if it is already being touched.
         if (isTouched.Value) return;
 
         PlayOnAllClientServerRpc(playerCollider.gameObject.name);
+    }
+
+    // This method will be executed when a player collides with the collider of the pad.
+    private void OnTriggerExit(Collider playerCollider)
+    {
+        Debug.Log("Pad has been exited!");
+
+        // Early return if the one releasing is not the one currently touching it.
+        if (playerCollider.gameObject != touchingPlayer.Value) return;
+
+        StopOnAllClientsClientRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -183,15 +196,6 @@ public class MadPads_Pad : NetworkBehaviour
         {
             sound.Value.Play();
         }
-    }
-
-    // This method will be executed when a player collides with the collider of the pad.
-    private void OnTriggerExit(Collider playerCollider)
-    {
-        // Early return if the one releasing is not the one currently touching it.
-        if (playerCollider.gameObject != touchingPlayer.Value) return;
-
-        StopOnAllClientsClientRpc();
     }
 
     [ServerRpc(RequireOwnership = false)]
