@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.Collections;
 
 /**
  * Hi Cem!
@@ -22,7 +23,7 @@ public class MadPads_Pad : NetworkBehaviour
     private Color _initialColor;
 
     // A distributed variable for the sound. This way we can change and distribute it at runtime.
-    public NetworkVariable<AudioSource> sound = new();
+    // public NetworkVariable<AudioSource> sound = new();
     
     // Distribute the triangle color, too, to show the color of the pad.
     public NetworkVariable<Color> color = new();
@@ -31,7 +32,7 @@ public class MadPads_Pad : NetworkBehaviour
     private readonly NetworkVariable<bool> isTouched = new();
 
     // A networked variable to keep track of who touches a pad.
-    private readonly NetworkVariable<GameObject> touchingPlayer = new();
+    private readonly NetworkVariable<FixedString64Bytes> touchingPlayerName = new();
 
     // A singleton for the renderer with a corresponding getter.
     private Renderer _renderer;
@@ -141,7 +142,9 @@ public class MadPads_Pad : NetworkBehaviour
 
     }
 
+
     // This method will be executed when a player collides with the collider of the pad.
+    [ContextMenu("OnTriggerEnter")]
     private void OnTriggerEnter(Collider playerCollider)
     {
         Debug.Log("Pad has been triggered!");
@@ -153,12 +156,13 @@ public class MadPads_Pad : NetworkBehaviour
     }
 
     // This method will be executed when a player collides with the collider of the pad.
+    [ContextMenu("OnTriggerExit")]
     private void OnTriggerExit(Collider playerCollider)
     {
         Debug.Log("Pad has been exited!");
 
         // Early return if the one releasing is not the one currently touching it.
-        if (playerCollider.gameObject != touchingPlayer.Value) return;
+        if (playerCollider.gameObject.name != touchingPlayerName.Value) return;
 
         StopOnAllClientsClientRpc();
     }
@@ -175,7 +179,7 @@ public class MadPads_Pad : NetworkBehaviour
         if (collidingPlayer != null)
         {
             // Let everyone know who touches the pad.
-            touchingPlayer.Value = collidingPlayer;
+            touchingPlayerName.Value = collidingPlayer.name;
         }
 
         // Now send the commands to be executed locally on the clients.
@@ -191,11 +195,13 @@ public class MadPads_Pad : NetworkBehaviour
         // TODO: Check if this needs to happen: https://www.youtube.com/watch?v=lPPa9y_czlE
         onTouch.Invoke();
 
+        /*
         // If there is a sound, play it now locally.
         if (sound.Value != null)
         {
             sound.Value.Play();
         }
+        */
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -216,12 +222,14 @@ public class MadPads_Pad : NetworkBehaviour
         // TODO: Check if this needs to happen: https://www.youtube.com/watch?v=lPPa9y_czlE
         onLeave.Invoke();
 
+        /*
         // If there is a sound playing, stop it now.
         if (sound.Value != null
             && sound.Value.isPlaying)
         {
             sound.Value.Stop();
         }
+        */
     }
 
     /**
