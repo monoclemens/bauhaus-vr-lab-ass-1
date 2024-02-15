@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8696876736903725500}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -78,6 +78,10 @@ PrefabInstance:
     - target: {fileID: 2820030303691852398, guid: 3c7e19b589b6d3f4293e65b4efd16380, type: 3}
       propertyPath: m_Name
       value: MadPads_Pad
+      objectReference: {fileID: 0}
+    - target: {fileID: 2820030303691852398, guid: 3c7e19b589b6d3f4293e65b4efd16380, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2820030303691925132, guid: 3c7e19b589b6d3f4293e65b4efd16380, type: 3}
       propertyPath: m_RootOrder
@@ -238,15 +242,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 540ae951337d96c4e8eb6185f9272e8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pad: {fileID: 0}
+  pad: {fileID: 8104385298412240788}
   onTouch:
     m_PersistentCalls:
       m_Calls: []
   onLeave:
     m_PersistentCalls:
       m_Calls: []
-  sound:
-    m_InternalValue: {fileID: 0}
   color:
     m_InternalValue: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &1576601355092108125
@@ -269,6 +271,22 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!54 &473469643603645297
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8104385298412240788}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!4 &8104385298412426102 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2820030303691925132, guid: 3c7e19b589b6d3f4293e65b4efd16380, type: 3}

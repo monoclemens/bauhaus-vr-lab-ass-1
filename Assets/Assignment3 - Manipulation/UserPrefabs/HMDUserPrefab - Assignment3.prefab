@@ -251,7 +251,7 @@ GameObject:
   - component: {fileID: 2994328690448271927}
   - component: {fileID: 3202409304010290370}
   - component: {fileID: 4056433018029097690}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Control-Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -541,7 +541,7 @@ GameObject:
   - component: {fileID: 5748754185830151209}
   - component: {fileID: 269397577991268249}
   - component: {fileID: 1752309973426107962}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LeftHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -797,7 +797,7 @@ GameObject:
   - component: {fileID: 2679059498078427805}
   - component: {fileID: 1821412047879728882}
   - component: {fileID: 7202416083162761210}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RightHand Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1088,7 +1088,7 @@ GameObject:
   - component: {fileID: 5601115267561759158}
   - component: {fileID: 7846704502050818674}
   - component: {fileID: 4949088410318727347}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: LeftHand Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1380,7 +1380,7 @@ GameObject:
   - component: {fileID: 5787508791579698296}
   - component: {fileID: 6680948114458344435}
   - component: {fileID: 8031514836950526083}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Control-Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2037,7 +2037,7 @@ GameObject:
   - component: {fileID: 8745856248759362810}
   - component: {fileID: 8329008757342248190}
   - component: {fileID: 7710966118986367023}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RightHand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2423,6 +2423,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5944169173779336167}
     m_Modifications:
+    - target: {fileID: 198041578351298225, guid: 238dcd6c921f5bf4bbc91e6e27150da5, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7368399238055488032, guid: 238dcd6c921f5bf4bbc91e6e27150da5, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -2471,6 +2475,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: HandRight
       objectReference: {fileID: 0}
+    - target: {fileID: 7857093315160584346, guid: 238dcd6c921f5bf4bbc91e6e27150da5, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 238dcd6c921f5bf4bbc91e6e27150da5, type: 3}
 --- !u!4 &5848668381540053003 stripped
@@ -2485,6 +2493,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3216455000693636108}
     m_Modifications:
+    - target: {fileID: 1638699524560670622, guid: 2717f4d99acd3ec49a239bdbc9b8aeaf, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7290663673485693605, guid: 2717f4d99acd3ec49a239bdbc9b8aeaf, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -2532,6 +2544,10 @@ PrefabInstance:
     - target: {fileID: 7955172610776877087, guid: 2717f4d99acd3ec49a239bdbc9b8aeaf, type: 3}
       propertyPath: m_Name
       value: HandLeft
+      objectReference: {fileID: 0}
+    - target: {fileID: 7955172610776877087, guid: 2717f4d99acd3ec49a239bdbc9b8aeaf, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2717f4d99acd3ec49a239bdbc9b8aeaf, type: 3}
