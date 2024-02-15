@@ -98,6 +98,10 @@ namespace VRSYS.Core.Networking
         [HideInInspector] public UnityEvent<List<LobbyData>> onLobbyListUpdated = new UnityEvent<List<LobbyData>>();
 
         private static string authenticatorGameObjectName = "UnityServicesAuthenticator";
+
+        //timer to start after the lobby is created
+        private System.Diagnostics.Stopwatch lobbyTimer;
+
         
         #endregion
 
@@ -311,6 +315,10 @@ namespace VRSYS.Core.Networking
                 // Create the lobby
                 lobby = await Lobbies.Instance.CreateLobbyAsync(lobbySettings.lobbyName, lobbySettings.maxUsers, options);
                 
+                //start the timer
+                lobbyTimer = System.Diagnostics.Stopwatch.StartNew();
+
+
                 // Save Lobby ID for later users
                 lobbyId = lobby.Id;
 
@@ -319,6 +327,8 @@ namespace VRSYS.Core.Networking
 
                 // Heartbeat the lobby every 15 seconds
                 StartCoroutine(HeartbeatLobbyCoroutine(lobby.Id, 15));
+
+                StartCoroutine(LogElapsedTimeCoroutine());
                 
                 // Relay & Lobby are set
                 
@@ -345,6 +355,17 @@ namespace VRSYS.Core.Networking
             {
                 Debug.LogError(e);
                 throw;
+            }
+        }
+
+        private IEnumerator LogElapsedTimeCoroutine()
+        {
+            int timeLeft;
+            while (lobbyTimer.Elapsed.TotalSeconds < 30)
+            {
+                yield return new WaitForSeconds(1); // Wait for 1 second
+                timeLeft = 30 - (int)lobbyTimer.Elapsed.TotalSeconds;
+                ExtendedLogger.LogInfo(GetType().Name, "First sequence will be played in: " + timeLeft.ToString());
             }
         }
         
