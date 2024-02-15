@@ -14,7 +14,7 @@ using UnityEngine.Events;
  * Anyway, important network variables for you are "sound" and "color".
  */
 
-public class MadPads_PadScript : NetworkBehaviour
+public class MadPads_Pad : NetworkBehaviour
 {
     public GameObject pad; 
     public UnityEvent onTouch;
@@ -102,8 +102,23 @@ public class MadPads_PadScript : NetworkBehaviour
         // Here we distribute a bool, this might be unnecessary and we could probably just initialite it with false.
         isTouched.Value = false;
 
-        // Locally keep track of the intial color. No need to distribute.
-        _initialColor = InteractiveMaterial.color;
+        // Locally keep track of the initial color. No need to distribute.
+        _initialColor = InteractiveMaterial.GetColor("_Color");
+
+        // The following code just demonstrates how to change the color of materials, @Cem.
+        Color testColor = new(
+            Random.Range(0f, 1f),
+            Random.Range(0f, 1f),
+            Random.Range(0f, 1f),
+            Random.Range(0f, 1f));
+
+        InteractiveMaterial.SetColor(
+            "_Color",
+            testColor);
+
+        TriangleMaterial.SetColor(
+            "_EmissionColor",
+            testColor);
 
         /**
          * Attach a listener to the color network variable.
@@ -115,7 +130,9 @@ public class MadPads_PadScript : NetworkBehaviour
     // The listener changing the triangle color.
     public void OnColorChanged (Color previous, Color current)
     {
-        TriangleMaterial.color = current;
+        TriangleMaterial.SetColor(
+            "_EmissionColor",
+            current);
     }
 
     // Update is called once per frame
