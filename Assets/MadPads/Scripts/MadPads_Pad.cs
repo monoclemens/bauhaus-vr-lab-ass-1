@@ -22,16 +22,16 @@ public class MadPads_Pad : NetworkBehaviour
     private Color _initialColor;
 
     // A distributed variable for the sound. This way we can change and distribute it at runtime.
-    public NetworkVariable<AudioSource> sound = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<AudioSource> sound = new();
     
     // Distribute the triangle color, too, to show the color of the pad.
-    public NetworkVariable<Color> color = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<Color> color = new();
 
     // This bool needs to be shared so all clients know if the a pad is being touched.
-    private readonly NetworkVariable<bool> isTouched = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    private readonly NetworkVariable<bool> isTouched = new();
 
     // A networked variable to keep track of who touches a pad.
-    private readonly NetworkVariable<GameObject> touchingPlayer = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    private readonly NetworkVariable<GameObject> touchingPlayer = new();
 
     // A singleton for the renderer with a corresponding getter.
     private Renderer _renderer;
@@ -147,18 +147,23 @@ public class MadPads_Pad : NetworkBehaviour
         // Early return if it is already being touched.
         if (isTouched.Value) return;
 
-        // Let everyone know who touches the pad.
-        touchingPlayer.Value = playerCollider.gameObject;
+        PlayOnAllClientServerRpc(playerCollider);
+    }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void PlayOnAllClientServerRpc (Collider playerCollider) {
         // Set the bool now so all clients learn about the change.
         isTouched.Value = true;
 
-        // And trigger the sound, color etc. on every client.
-        PlayOnAllClientsClientRpc();
+        // Let everyone know who touches the pad.
+        touchingPlayer.Value = playerCollider.gameObject;
+
+        // Now send the commands to be executed locally on the clients.
+        PlayOnAllClientsClientRpc(playerCollider);
     }
 
     [ClientRpc]
-    void PlayOnAllClientsClientRpc()
+    public void PlayOnAllClientsClientRpc(Collider playerCollider)
     {
         // Locally change the pads color for everyone.
         TogglePadColor();
@@ -166,7 +171,7 @@ public class MadPads_Pad : NetworkBehaviour
         // TODO: Check if this needs to happen: https://www.youtube.com/watch?v=lPPa9y_czlE
         onTouch.Invoke();
 
-        // If there is a sound, play it now.
+        // If there is a sound, play it now locally.
         if (sound.Value != null)
         {
             sound.Value.Play();
@@ -179,6 +184,12 @@ public class MadPads_Pad : NetworkBehaviour
         // Early return if the one releasing is not the one currently touching it.
         if (playerCollider.gameObject != touchingPlayer.Value) return;
 
+        StopOnAllClientsClientRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void StopPlayingOnAllClientsServerRpc()
+    {
         // Let everyone know that the pad is not being touched anymore.
         isTouched.Value = false;
 
@@ -200,5 +211,16 @@ public class MadPads_Pad : NetworkBehaviour
         {
             sound.Value.Stop();
         }
+    }
+
+    /**
+     * An RPC that can be sent from any client to the server. 
+     * It will modify the color network variable.
+     * This will in turn trigger the OnValueChanged on every client.
+     */
+    [ServerRpc(RequireOwnership = false)]
+    public void ChangePadColorServerRpc (Color newColor)
+    {
+        color.Value = newColor;
     }
 }
