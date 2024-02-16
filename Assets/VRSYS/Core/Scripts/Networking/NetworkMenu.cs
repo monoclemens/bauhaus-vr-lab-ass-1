@@ -44,6 +44,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRSYS.Core.Logging;
 using VRSYS.Core.ScriptableObjects;
+using System.IO;
+
 
 namespace VRSYS.Core.Networking
 {
@@ -72,6 +74,8 @@ namespace VRSYS.Core.Networking
         public Button createLobbyButton;
         public Button backButton;
         public TextMeshProUGUI stateText;
+        //pads
+        public TMP_Dropdown pad1Dropdown;
 
         [Header("Lobby Tiles")] 
         public GameObject lobbyTilePrefab;
@@ -82,6 +86,9 @@ namespace VRSYS.Core.Networking
 
         public List<UserRole> unavailableUserRoles;
         private List<UserRole> userRoles;
+
+        private List<string> sampleNames = new List<string>();
+
         
         private NetworkUserSpawnInfo spawnInfo => ConnectionManager.Instance.userSpawnInfo;
 
@@ -94,6 +101,15 @@ namespace VRSYS.Core.Networking
             userRoles = Enum.GetValues(typeof(UserRole)).Cast<UserRole>().ToList();
             foreach (var unavailableUserRole in unavailableUserRoles)
                 userRoles.Remove(unavailableUserRole);
+
+
+            //get the names of audio files to have them as options
+            AudioClip[] audioClips = Resources.LoadAll<AudioClip>("audio/samples");
+            foreach (AudioClip audioClip in audioClips)
+            {
+                //Debug.Log("AudioClip Name: " + audioClip.name + Path.GetExtension(audioClip.name));
+                sampleNames.Add(audioClip.name.ToString());
+            }
 
             if (ConnectionManager.Instance.lobbySettings.autoStart)
             {
@@ -143,6 +159,17 @@ namespace VRSYS.Core.Networking
             userColorDropdown.AddOptions(availableUserColors);
             
             spawnInfo.userColor = avatarColors[0].color;
+            
+            //sample names are added as options for the dropdown
+            pad1Dropdown.options.Clear();
+
+            List<string> availableSampleNames = new List<string>();
+            foreach (var sampleName in sampleNames)
+            {
+                availableSampleNames.Add(sampleName);
+            }
+
+            pad1Dropdown.AddOptions(availableSampleNames);
         }
 
         private void SetupUIEvents()
@@ -163,7 +190,10 @@ namespace VRSYS.Core.Networking
                 createLobbyButton.onClick.AddListener(CreateLobby);
             if(backButton is not null)
                 backButton.onClick.AddListener(Back);
-            
+            //sample dropdowns
+            //TO-DO: add the script to attach the audio to the audiosource
+            if(pad1Dropdown is not null)
+                pad1Dropdown.onValueChanged.AddListener(UpdatePadAudio);
             ConnectionManager.Instance.onConnectionStateChange.AddListener(UpdateConnectionState);
             ConnectionManager.Instance.onLobbyListUpdated.AddListener(UpdateLobbyList);
         }
@@ -216,6 +246,12 @@ namespace VRSYS.Core.Networking
         {
             lobbyOverview.SetActive(true);
             createLobbySection.SetActive(false);
+        }
+
+        private void UpdatePadAudio(int sample)
+        {
+            string sample_name = pad1Dropdown.options[pad1Dropdown.value].text;
+            Debug.Log(sample_name);
         }
         
         private void UpdateConnectionState(ConnectionState state)

@@ -135,7 +135,7 @@ namespace VRSYS.Core.Networking
             audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.spatialBlend = 0f;
             
-            audioPath = Resources.Load<AudioClip>("samples/initial_seq");
+            audioPath = Resources.Load<AudioClip>("audio/initial_seq");
             
             if (connectionState == ConnectionState.Offline)
             {
