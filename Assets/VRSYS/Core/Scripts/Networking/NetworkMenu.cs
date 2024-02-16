@@ -87,8 +87,10 @@ namespace VRSYS.Core.Networking
         public List<UserRole> unavailableUserRoles;
         private List<UserRole> userRoles;
 
+        //the list to store sample file names
         private List<string> sampleNames = new List<string>();
-
+        private List<AudioClip> audioClips = new List<AudioClip>();
+        
         
         private NetworkUserSpawnInfo spawnInfo => ConnectionManager.Instance.userSpawnInfo;
 
@@ -103,11 +105,12 @@ namespace VRSYS.Core.Networking
                 userRoles.Remove(unavailableUserRole);
 
 
-            //get the names of audio files to have them as options
-            AudioClip[] audioClips = Resources.LoadAll<AudioClip>("audio/samples");
+            //get the names of audio files in the dedicated directory
+            //to have them as options
+            audioClips = Resources.LoadAll<AudioClip>("audio/samples").ToList();
             foreach (AudioClip audioClip in audioClips)
             {
-                //Debug.Log("AudioClip Name: " + audioClip.name + Path.GetExtension(audioClip.name));
+                //should we check for wav?
                 sampleNames.Add(audioClip.name.ToString());
             }
 
@@ -161,6 +164,7 @@ namespace VRSYS.Core.Networking
             spawnInfo.userColor = avatarColors[0].color;
             
             //sample names are added as options for the dropdown
+            //default options of OptionA etc. are cleared
             pad1Dropdown.options.Clear();
 
             List<string> availableSampleNames = new List<string>();
@@ -251,7 +255,14 @@ namespace VRSYS.Core.Networking
         private void UpdatePadAudio(int sample)
         {
             string sample_name = pad1Dropdown.options[pad1Dropdown.value].text;
-            Debug.Log(sample_name);
+            GameObject interactableCube = GameObject.Find("InteractableCube");
+
+            if (interactableCube != null)
+            {
+                AudioSource audioSource = interactableCube.GetComponent<AudioSource>();
+                audioSource.clip = audioClips[pad1Dropdown.value];
+                audioSource.Play();
+            }
         }
         
         private void UpdateConnectionState(ConnectionState state)
