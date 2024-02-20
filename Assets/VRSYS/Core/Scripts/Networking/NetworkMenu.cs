@@ -76,8 +76,7 @@ namespace VRSYS.Core.Networking
         public TextMeshProUGUI stateText;
         //pads
         public List<TMP_Dropdown> padDropdowns = new List<TMP_Dropdown>(6);
-        /*public TMP_Dropdown pad1Dropdown;
-        public TMP_Dropdown pad2Dropdown;*/
+        
 
         [Header("Lobby Tiles")] 
         public GameObject lobbyTilePrefab;
@@ -90,7 +89,6 @@ namespace VRSYS.Core.Networking
         private List<UserRole> userRoles;
 
         //the list to store sample file names
-        //private List<string> sampleNames = new List<string>();
         private List<AudioClip> audioClips = new List<AudioClip>();
         
         
