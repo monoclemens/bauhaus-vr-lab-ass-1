@@ -75,7 +75,9 @@ namespace VRSYS.Core.Networking
         public Button backButton;
         public TextMeshProUGUI stateText;
         //pads
-        public TMP_Dropdown pad1Dropdown;
+        public List<TMP_Dropdown> padDropdowns = new List<TMP_Dropdown>(6);
+        /*public TMP_Dropdown pad1Dropdown;
+        public TMP_Dropdown pad2Dropdown;*/
 
         [Header("Lobby Tiles")] 
         public GameObject lobbyTilePrefab;
@@ -88,7 +90,7 @@ namespace VRSYS.Core.Networking
         private List<UserRole> userRoles;
 
         //the list to store sample file names
-        private List<string> sampleNames = new List<string>();
+        //private List<string> sampleNames = new List<string>();
         private List<AudioClip> audioClips = new List<AudioClip>();
         
         
@@ -108,11 +110,7 @@ namespace VRSYS.Core.Networking
             //get the names of audio files in the dedicated directory
             //to have them as options
             audioClips = Resources.LoadAll<AudioClip>("audio/samples").ToList();
-            foreach (AudioClip audioClip in audioClips)
-            {
-                //should we check for wav?
-                sampleNames.Add(audioClip.name.ToString());
-            }
+            
 
             if (ConnectionManager.Instance.lobbySettings.autoStart)
             {
@@ -165,15 +163,19 @@ namespace VRSYS.Core.Networking
             
             //sample names are added as options for the dropdown
             //default options of OptionA etc. are cleared
-            pad1Dropdown.options.Clear();
+            
 
             List<string> availableSampleNames = new List<string>();
-            foreach (var sampleName in sampleNames)
+            foreach (var audioClip in audioClips)
             {
-                availableSampleNames.Add(sampleName);
+                availableSampleNames.Add(audioClip.name.ToString());
             }
-
-            pad1Dropdown.AddOptions(availableSampleNames);
+            foreach(var dropdown in padDropdowns)
+            {
+                dropdown.options.Clear();
+                dropdown.AddOptions(availableSampleNames);
+            }
+            
         }
 
         private void SetupUIEvents()
@@ -196,8 +198,16 @@ namespace VRSYS.Core.Networking
                 backButton.onClick.AddListener(Back);
             //sample dropdowns
             //TO-DO: add the script to attach the audio to the audiosource
-            if(pad1Dropdown is not null)
-                pad1Dropdown.onValueChanged.AddListener(UpdatePadAudio);
+            for (int i = 0; i < padDropdowns.Count; i++)
+            {
+                // Check if the dropdown is not null
+                if (padDropdowns[i] != null)
+                {
+                    // Add the listener for the specific pad
+                    int padIndex = i; // Assuming your pads are indexed from 1 to 18
+                    padDropdowns[i].onValueChanged.AddListener(delegate { UpdatePadAudio(padIndex); });
+                }
+            }
             ConnectionManager.Instance.onConnectionStateChange.AddListener(UpdateConnectionState);
             ConnectionManager.Instance.onLobbyListUpdated.AddListener(UpdateLobbyList);
         }
@@ -252,15 +262,16 @@ namespace VRSYS.Core.Networking
             createLobbySection.SetActive(false);
         }
 
-        private void UpdatePadAudio(int sample)
+        private void UpdatePadAudio(int padIndex)
         {
-            string sample_name = pad1Dropdown.options[pad1Dropdown.value].text;
+            string sample_name = padDropdowns[padIndex].options[padDropdowns[padIndex].value].text;
+            //pad number indices should be added
             GameObject interactableCube = GameObject.Find("InteractableCube");
 
             if (interactableCube != null)
             {
                 AudioSource audioSource = interactableCube.GetComponent<AudioSource>();
-                audioSource.clip = audioClips[pad1Dropdown.value];
+                audioSource.clip = audioClips[padDropdowns[padIndex].value];
                 audioSource.Play();
             }
         }
