@@ -75,7 +75,7 @@ namespace VRSYS.Core.Networking
         public Button backButton;
         public TextMeshProUGUI stateText;
         //pads
-        public List<TMP_Dropdown> padDropdowns = new List<TMP_Dropdown>(6);
+        public List<TMP_Dropdown> padDropdowns = new List<TMP_Dropdown>(18);
         
 
         [Header("Lobby Tiles")] 
