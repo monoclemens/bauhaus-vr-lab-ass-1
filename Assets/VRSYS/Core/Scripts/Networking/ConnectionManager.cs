@@ -374,7 +374,7 @@ namespace VRSYS.Core.Networking
         {
             int timeLeft;
             NetworkedAudioPlayer initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
-            while (lobbyTimer.Elapsed.TotalSeconds < 10)
+            while (lobbyTimer.Elapsed.TotalSeconds < 5)
             {
                 yield return new WaitForSeconds(1); // Wait for 1 second
                 timeLeft = 30 - (int)lobbyTimer.Elapsed.TotalSeconds;

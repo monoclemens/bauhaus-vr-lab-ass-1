@@ -7,7 +7,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     #region Member Variables
 
     [SerializeField]
-    private AudioClip audioPath;
+    private AudioClip audioClip;
 
     private NetworkVariable<bool> isAudioPlaying = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
@@ -25,7 +25,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
-        audioPath = Resources.Load<AudioClip>("audio/initial_seq");
+        audioClip = Resources.Load<AudioClip>("audio/initial_seq");
         audioSource.spatialBlend = 0f;
     }
 
@@ -33,7 +33,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     #region Audio Methods
 
-    public void PlayAudio()
+    public void PlayAudio(float duration = 0)
     {
         if (isAudioPlaying.Value)
         {
@@ -42,7 +42,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         }
 
         isAudioPlaying.Value = true;
-        PlayAudioServerRpc();
+        PlayAudioServerRpc(duration);
     }
 
     #endregion
@@ -50,19 +50,21 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     #region RPCs
 
     [ServerRpc(RequireOwnership = false)]
-    private void PlayAudioServerRpc()
+    private void PlayAudioServerRpc(float duration)
     {
-        PlayAudioClientRpc();
+        PlayAudioClientRpc(duration);
     }
 
     [ClientRpc]
-    private void PlayAudioClientRpc()
+    private void PlayAudioClientRpc(float duration)
     {
-        if (audioPath != null)
+        if (audioClip != null)
         {
-            audioSource.clip = audioPath;
+            
+            audioSource.clip = audioClip;
             ExtendedLogger.LogInfo(GetType().Name, "plazing");
             audioSource.Play();
+            audioSource.SetScheduledEndTime(AudioSettings.dspTime + (0.2));
         }
         else
         {
