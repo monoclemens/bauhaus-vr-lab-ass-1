@@ -90,8 +90,9 @@ namespace VRSYS.Core.Networking
 
         //the list to store sample file names
         private List<AudioClip> audioClips = new List<AudioClip>();
-        
-        
+        private GameObject interactableCube;
+
+
         private NetworkUserSpawnInfo spawnInfo => ConnectionManager.Instance.userSpawnInfo;
 
         #endregion
@@ -108,7 +109,9 @@ namespace VRSYS.Core.Networking
             //get the names of audio files in the dedicated directory
             //to have them as options
             audioClips = Resources.LoadAll<AudioClip>("audio/samples").ToList();
-            
+
+            interactableCube = GameObject.Find("InteractableCube");
+
 
             if (ConnectionManager.Instance.lobbySettings.autoStart)
             {
@@ -196,6 +199,8 @@ namespace VRSYS.Core.Networking
                 backButton.onClick.AddListener(Back);
             //sample dropdowns
             //TO-DO: add the script to attach the audio to the audiosource
+
+        
             for (int i = 0; i < padDropdowns.Count; i++)
             {
                 // Check if the dropdown is not null
@@ -264,7 +269,7 @@ namespace VRSYS.Core.Networking
         {
             string sample_name = padDropdowns[padIndex].options[padDropdowns[padIndex].value].text;
             //pad number indices should be added
-            GameObject interactableCube = GameObject.Find("InteractableCube");
+            
 
             if (interactableCube != null)
             {
