@@ -53,6 +53,7 @@ using UnityEngine.Events;
 using VRSYS.Core.Logging;
 using VRSYS.Core.ScriptableObjects;
 using Random = UnityEngine.Random;
+using Unity.Netcode;
 
 namespace VRSYS.Core.Networking
 {
@@ -103,9 +104,10 @@ namespace VRSYS.Core.Networking
         private System.Diagnostics.Stopwatch lobbyTimer;
 
         //audio source from which the sequences will be played
-        private AudioSource audioSource;
+        //private AudioSource audioSource;
 
         //initial seq audio path
+        [SerializeField]
         private AudioClip audioPath;
 
         
@@ -131,12 +133,7 @@ namespace VRSYS.Core.Networking
 
         private async void Start()
         {
-            //set audio source and set stereo
-            audioSource = gameObject.AddComponent<AudioSource>();
-            audioSource.spatialBlend = 0f;
-            
-            audioPath = Resources.Load<AudioClip>("audio/initial_seq");
-            
+
             if (connectionState == ConnectionState.Offline)
             {
                 connectionState = ConnectionState.Connecting;
@@ -376,28 +373,20 @@ namespace VRSYS.Core.Networking
         private IEnumerator LogElapsedTimeCoroutine()
         {
             int timeLeft;
-            while (lobbyTimer.Elapsed.TotalSeconds < 30)
+            NetworkedAudioPlayer initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
+            while (lobbyTimer.Elapsed.TotalSeconds < 10)
             {
                 yield return new WaitForSeconds(1); // Wait for 1 second
                 timeLeft = 30 - (int)lobbyTimer.Elapsed.TotalSeconds;
+
                 ExtendedLogger.LogInfo(GetType().Name, "First sequence will be played in: " + timeLeft.ToString());
+
+                    
             }
-            PlayInitialSeq();
+            initialAudioPlayer.PlayAudio();
         }
 
-        private void PlayInitialSeq()
-        {
-            if (audioPath != null)
-            {
-                audioSource.clip = audioPath;
-                audioSource.Play();
-            }
-            else
-            {
-                Debug.LogError("Audio clip not found. Make sure the file path is correct.");
-            }
-        }
-        
+ 
         private IEnumerator HeartbeatLobbyCoroutine(string lobbyName, float waitTimeSeconds)
         {
             var delay = new WaitForSecondsRealtime(waitTimeSeconds);
