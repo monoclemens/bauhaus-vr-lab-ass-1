@@ -14,6 +14,8 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     private AudioSource audioSource;
 
+    private float clipLength;
+
     #endregion
 
     #region Initialization
@@ -26,6 +28,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
         }
         audioClip = Resources.Load<AudioClip>("audio/initial_seq");
+        clipLength = audioClip.length;
         audioSource.spatialBlend = 0f;
     }
 
@@ -35,10 +38,15 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     public void PlayAudio(float duration = 0)
     {
+        //this shouldn't be here when we go into pad playing
         if (isAudioPlaying.Value)
         {
             Debug.LogWarning("Audio is already playing.");
             return;
+        }
+        if (duration == 0)
+        {
+            duration = clipLength;
         }
 
         isAudioPlaying.Value = true;
@@ -62,9 +70,9 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         {
             
             audioSource.clip = audioClip;
-            ExtendedLogger.LogInfo(GetType().Name, "plazing");
+            //ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
             audioSource.Play();
-            audioSource.SetScheduledEndTime(AudioSettings.dspTime + (0.2));
+            audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
         }
         else
         {

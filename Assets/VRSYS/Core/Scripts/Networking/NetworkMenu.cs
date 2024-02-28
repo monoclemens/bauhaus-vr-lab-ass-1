@@ -74,7 +74,7 @@ namespace VRSYS.Core.Networking
         public Button createLobbyButton;
         public Button backButton;
         public TextMeshProUGUI stateText;
-        //pads
+        //pad dropdowns
         public List<TMP_Dropdown> padDropdowns = new List<TMP_Dropdown>(18);
         
 
