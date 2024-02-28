@@ -27,30 +27,64 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
-        audioClip = Resources.Load<AudioClip>("audio/initial_seq");
-        clipLength = audioClip.length;
-        audioSource.spatialBlend = 0f;
+        
     }
 
     #endregion
 
+    #region Update
+    /*void Update()
+    {
+        Debug.Log(isAudioPlaying.Value.ToString());
+        if (isAudioPlaying.Value)
+        {
+            if (!audioSource.isPlaying)
+            {
+                // The audio clip has finished playing
+                Debug.Log("Audio clip has finished playing.");
+
+                // Set isAudioPlaying to false when the audio finishes playing
+                isAudioPlaying.Value = false;
+
+                // You can perform any actions or logic here after the audio clip has finished playing
+            }
+        }
+    }*/
+    #endregion
     #region Audio Methods
 
-    public void PlayAudio(float duration = 0)
+    public void PlayAudio( double duration = 0)
     {
-        //this shouldn't be here when we go into pad playing
         if (isAudioPlaying.Value)
         {
             Debug.LogWarning("Audio is already playing.");
             return;
         }
+        //the initial recognizable sequence
         if (duration == 0)
         {
             duration = clipLength;
         }
+       
 
         isAudioPlaying.Value = true;
         PlayAudioServerRpc(duration);
+    }
+    public void setAudio(string audioPath = "")
+    {
+        AudioClip tempAudioClip = Resources.Load<AudioClip>(audioPath);
+        if (tempAudioClip != null)
+        {
+            audioClip = tempAudioClip;
+            clipLength = audioClip.length;
+            //set it stereo i dunno what option is better
+            audioSource.spatialBlend = 0f;
+        }
+        else
+        {
+            Debug.LogWarning("No such audio");
+            return;
+        }
     }
 
     #endregion
@@ -58,13 +92,13 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     #region RPCs
 
     [ServerRpc(RequireOwnership = false)]
-    private void PlayAudioServerRpc(float duration)
+    private void PlayAudioServerRpc(double duration)
     {
         PlayAudioClientRpc(duration);
     }
 
     [ClientRpc]
-    private void PlayAudioClientRpc(float duration)
+    private void PlayAudioClientRpc(double duration)
     {
         if (audioClip != null)
         {

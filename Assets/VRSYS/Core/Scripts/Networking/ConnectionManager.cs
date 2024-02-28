@@ -103,16 +103,14 @@ namespace VRSYS.Core.Networking
         //timer to start after the lobby is created
         private System.Diagnostics.Stopwatch lobbyTimer;
 
-        //audio source from which the sequences will be played
-        //private AudioSource audioSource;
+        //timer duration
+        private int timerLength = 30;
 
-        //initial seq audio path
-        [SerializeField]
-        private AudioClip audioPath;
 
-        
 
-        
+
+
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -369,15 +367,17 @@ namespace VRSYS.Core.Networking
                 throw;
             }
         }
-
+        //a timer for the initial sequence to play
         private IEnumerator LogElapsedTimeCoroutine()
         {
             int timeLeft;
+            //for now it is playing from the interactable cube
             NetworkedAudioPlayer initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
-            while (lobbyTimer.Elapsed.TotalSeconds < 5)
+            initialAudioPlayer.setAudio("audio/initial_seq");
+            while (lobbyTimer.Elapsed.TotalSeconds < timerLength)
             {
                 yield return new WaitForSeconds(1); // Wait for 1 second
-                timeLeft = 30 - (int)lobbyTimer.Elapsed.TotalSeconds;
+                timeLeft = timerLength - (int)lobbyTimer.Elapsed.TotalSeconds;
 
                 ExtendedLogger.LogInfo(GetType().Name, "First sequence will be played in: " + timeLeft.ToString());
 
