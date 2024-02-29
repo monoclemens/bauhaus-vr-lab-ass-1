@@ -6,11 +6,13 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 {
     #region Member Variables
 
-    
+
 
     //private NetworkVariable<bool> isAudioPlaying = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
-
+    private string padName = "";
     private AudioSource audioSource;
+    //private NetworkVariable<AudioSource> networkedAudioSource = new NetworkVariable<AudioSource>();
+
 
     private float clipLength;
 
@@ -20,7 +22,9 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     private void Awake()
     {
+        padName = this.gameObject.name;
         audioSource = GetComponent<AudioSource>();
+        //networkedAudioSource.Value = GetComponent<AudioSource>();
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -53,7 +57,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     //only when choosing audio for pads no need to distribute
     public void LocallyPlayAudio()
     {
-        ExtendedLogger.LogInfo(GetType().Name, "Changed " + clipLength.ToString());
+        ExtendedLogger.LogInfo(GetType().Name," Audio attached to " + padName +  " changed!");
         audioSource.Play();
     }
 
@@ -85,7 +89,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
             clipLength = tempAudioClip.length;
             //set it stereo i dunno what option is better
             audioSource.spatialBlend = 0f;
-            Debug.Log(clipName + "added");
         }
         else
         {
