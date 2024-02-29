@@ -104,7 +104,7 @@ namespace VRSYS.Core.Networking
         private System.Diagnostics.Stopwatch lobbyTimer;
 
         //timer duration
-        private int timerLength = 30;
+        private int timerLength = 5;
 
 
 
@@ -373,7 +373,7 @@ namespace VRSYS.Core.Networking
             int timeLeft;
             //for now it is playing from the interactable cube
             NetworkedAudioPlayer initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
-            initialAudioPlayer.setAudio("audio/initial_seq");
+            initialAudioPlayer.SetAudio("initial_seq");
             while (lobbyTimer.Elapsed.TotalSeconds < timerLength)
             {
                 yield return new WaitForSeconds(1); // Wait for 1 second

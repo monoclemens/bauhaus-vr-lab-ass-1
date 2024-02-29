@@ -90,7 +90,7 @@ namespace VRSYS.Core.Networking
 
         //the list to store sample file names
         private List<AudioClip> audioClips = new List<AudioClip>();
-        private GameObject interactableCube;
+        public List<NetworkedAudioPlayer> pads;
 
 
         private NetworkUserSpawnInfo spawnInfo => ConnectionManager.Instance.userSpawnInfo;
@@ -110,7 +110,32 @@ namespace VRSYS.Core.Networking
             //to have them as options
             audioClips = Resources.LoadAll<AudioClip>("audio/samples").ToList();
 
-            interactableCube = GameObject.Find("InteractableCube");
+            //find the parent of the grids
+            Transform grids = GameObject.Find("MadPads").transform;
+            //add all pads into the pads list to then assign the audios
+            foreach (Transform padsGroup in grids)
+            {
+                Transform grid = padsGroup.GetChild(0);
+                for (int i = 0; i < grid.childCount; i++)
+                {
+                    // Access the i-th child
+                    Transform childPad = grid.GetChild(i);
+                    NetworkedAudioPlayer padAudioPlayer = childPad.GetChild(0).gameObject.GetComponent<NetworkedAudioPlayer>();
+                    if (padAudioPlayer != null)
+                    {
+                        padAudioPlayer.SetAudio("samples/" + audioClips[i].name.ToString());
+                        pads.Add(padAudioPlayer);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("childPad is null");
+                    }
+                    
+                    
+
+                }
+            }
+
 
 
             if (ConnectionManager.Instance.lobbySettings.autoStart)
@@ -170,6 +195,7 @@ namespace VRSYS.Core.Networking
             foreach (var audioClip in audioClips)
             {
                 availableSampleNames.Add(audioClip.name.ToString());
+
             }
             foreach(var dropdown in padDropdowns)
             {
@@ -269,16 +295,20 @@ namespace VRSYS.Core.Networking
         {
             string sample_name = padDropdowns[padIndex].options[padDropdowns[padIndex].value].text;
             //pad number indices should be added
-            
-
-            if (interactableCube != null)
+            if (pads[padIndex] != null)
             {
-                AudioSource audioSource = interactableCube.GetComponent<AudioSource>();
+                pads[padIndex].SetAudio("samples/" + sample_name);
+                pads[padIndex].LocallyPlayAudio();
+            }
+
+            /*if (pad != null)
+            {
+                AudioSource audioSource = pad.GetComponent<AudioSource>();
                 audioSource.clip = audioClips[padDropdowns[padIndex].value];
                 audioSource.Play();
-            }
+            }*/
         }
-        
+
         private void UpdateConnectionState(ConnectionState state)
         {
             switch (state)

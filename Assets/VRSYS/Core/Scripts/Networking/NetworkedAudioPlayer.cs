@@ -6,11 +6,9 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 {
     #region Member Variables
 
-    [SerializeField]
-    private AudioClip audioClip;
+    
 
-    private NetworkVariable<bool> isAudioPlaying = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server);
+    //private NetworkVariable<bool> isAudioPlaying = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
     private AudioSource audioSource;
 
@@ -52,33 +50,42 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     }*/
     #endregion
     #region Audio Methods
-
-    public void PlayAudio( double duration = 0)
+    //only when choosing audio for pads no need to distribute
+    public void LocallyPlayAudio()
     {
-        if (isAudioPlaying.Value)
+        ExtendedLogger.LogInfo(GetType().Name, "Changed " + clipLength.ToString());
+        audioSource.Play();
+    }
+
+    public void PlayAudio(double duration = 0)
+    {
+        /*if (isAudioPlaying.Value)
         {
             Debug.LogWarning("Audio is already playing.");
             return;
-        }
+        }*/
         //the initial recognizable sequence
         if (duration == 0)
         {
             duration = clipLength;
         }
-       
 
-        isAudioPlaying.Value = true;
+
+        //isAudioPlaying.Value = true;
+        ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
         PlayAudioServerRpc(duration);
     }
-    public void setAudio(string audioPath = "")
+    public void SetAudio(string clipName = "")
     {
+        string audioPath = "audio/" + clipName;
         AudioClip tempAudioClip = Resources.Load<AudioClip>(audioPath);
         if (tempAudioClip != null)
         {
-            audioClip = tempAudioClip;
-            clipLength = audioClip.length;
+            audioSource.clip = tempAudioClip;
+            clipLength = tempAudioClip.length;
             //set it stereo i dunno what option is better
             audioSource.spatialBlend = 0f;
+            Debug.Log(clipName + "added");
         }
         else
         {
@@ -94,17 +101,17 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void PlayAudioServerRpc(double duration)
     {
+        ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
         PlayAudioClientRpc(duration);
     }
 
     [ClientRpc]
     private void PlayAudioClientRpc(double duration)
     {
-        if (audioClip != null)
+        if (audioSource.clip != null)
         {
-            
-            audioSource.clip = audioClip;
-            //ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
+            ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
+
             audioSource.Play();
             audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
         }
