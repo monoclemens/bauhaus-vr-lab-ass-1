@@ -32,19 +32,13 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         }
         audioSource.spatialBlend = 0f;
 
-
     }
 
     #endregion
 
     
     #region Audio Methods
-    //only when choosing audio for pads no need to distribute
-    public void LocallyPlayAudio()
-    {
-        ExtendedLogger.LogInfo(GetType().Name," Audio attached to " + padName + " on the " + side + " side changed!");
-        audioSource.Play();
-    }
+    
 
     public void PlayAudio(double duration = 0)
     {
@@ -67,12 +61,70 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     public void SetAudio(string clipName = "")
     {
-        
         FixedString32Bytes path = new FixedString32Bytes("audio/" + clipName);
-        SetAudioServerRpc(path);
-        ExtendedLogger.LogInfo(GetType().Name, path.ToString());
+        if(clipName.StartsWith("samples/"))
+        {
+            LocallySetAudio(path);
+        }
+        else
+        {
+            
+            SetAudioServerRpc(path);
+            ExtendedLogger.LogInfo(GetType().Name, path.ToString());
+        }
     }
 
+    //only when choosing audio for pads no need to distribute
+    public void LocallyPlayAudio()
+    {
+        ExtendedLogger.LogInfo(GetType().Name," Audio attached to " + padName + " on the " + side + " side changed!");
+        audioSource.Play();
+    }
+    
+    public void LocallySetAudio(FixedString32Bytes path)
+    {
+        audioPath.Value = path;
+        AudioClip tempAudioClip = Resources.Load<AudioClip>(audioPath.Value.ToString());
+        if (tempAudioClip != null)
+        {
+            audioSource.clip = tempAudioClip;
+            clipLength = tempAudioClip.length;            
+            ExtendedLogger.LogInfo(GetType().Name, "Successfully set audio!");
+        }
+        else
+        {
+            Debug.LogWarning("No such audio");
+            return;
+        }
+    }
+
+    #endregion
+
+    #region RPCs
+    //not needed!!! just bypass it and go from the local play to client
+    [ServerRpc(RequireOwnership = false)]
+    private void PlayAudioServerRpc(double duration)
+    {
+        ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
+        PlayAudioClientRpc(duration);
+    }
+
+    [ClientRpc]
+    private void PlayAudioClientRpc(double duration)
+    {
+        if (audioSource.clip != null)
+        {
+            
+
+            audioSource.Play();
+            audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
+            ExtendedLogger.LogInfo(GetType().Name, "PLAZED MAAAAN");
+        }
+        else
+        {
+            Debug.LogError("Audio clip not found. Make sure the file path is correct.");
+        }
+    }
     [ServerRpc(RequireOwnership = false)]
     private void SetAudioServerRpc(FixedString32Bytes path)
     {
@@ -97,34 +149,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         {
             Debug.LogWarning("No such audio");
             return;
-        }
-    }
-
-    #endregion
-
-    #region RPCs
-
-    [ServerRpc(RequireOwnership = false)]
-    private void PlayAudioServerRpc(double duration)
-    {
-        ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
-        PlayAudioClientRpc(duration);
-    }
-
-    [ClientRpc]
-    private void PlayAudioClientRpc(double duration)
-    {
-        if (audioSource.clip != null)
-        {
-            
-
-            audioSource.Play();
-            audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
-            ExtendedLogger.LogInfo(GetType().Name, "PLAZED MAAAAN");
-        }
-        else
-        {
-            Debug.LogError("Audio clip not found. Make sure the file path is correct.");
         }
     }
 
