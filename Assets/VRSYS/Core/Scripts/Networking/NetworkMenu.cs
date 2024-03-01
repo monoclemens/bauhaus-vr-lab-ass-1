@@ -123,7 +123,7 @@ namespace VRSYS.Core.Networking
                     NetworkedAudioPlayer padAudioPlayer = childPad.GetChild(0).gameObject.GetComponent<NetworkedAudioPlayer>();
                     if (padAudioPlayer != null)
                     {
-                        
+
                         padAudioPlayer.SetAudio("samples/" + audioClips[i].name.ToString());
                         pads.Add(padAudioPlayer);
                     }
@@ -131,13 +131,8 @@ namespace VRSYS.Core.Networking
                     {
                         Debug.LogWarning("childPad is null");
                     }
-                    
-                    
-
                 }
             }
-
-
 
             if (ConnectionManager.Instance.lobbySettings.autoStart)
             {
@@ -299,16 +294,12 @@ namespace VRSYS.Core.Networking
             //pad number indices should be added
             if (pads[padIndex] != null)
             {
+                ExtendedLogger.LogInfo(GetType().Name, "samples/" + sample_name);
                 pads[padIndex].SetAudio("samples/" + sample_name);
                 pads[padIndex].LocallyPlayAudio();
             }
 
-            /*if (pad != null)
-            {
-                AudioSource audioSource = pad.GetComponent<AudioSource>();
-                audioSource.clip = audioClips[padDropdowns[padIndex].value];
-                audioSource.Play();
-            }*/
+            
         }
 
         private void UpdateConnectionState(ConnectionState state)

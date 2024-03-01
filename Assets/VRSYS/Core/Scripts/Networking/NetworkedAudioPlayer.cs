@@ -26,11 +26,11 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     {
         padName = gameObject.transform.parent != null ? gameObject.transform.parent.gameObject.name : "No Name";
         audioSource = GetComponent<AudioSource>();
-        //networkedAudioSource.Value = GetComponent<AudioSource>();
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
+        audioSource.spatialBlend = 0f;
 
 
     }
@@ -67,15 +67,17 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     public void SetAudio(string clipName = "")
     {
+        
         FixedString32Bytes path = new FixedString32Bytes("audio/" + clipName);
         SetAudioServerRpc(path);
+        ExtendedLogger.LogInfo(GetType().Name, path.ToString());
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void SetAudioServerRpc(FixedString32Bytes path)
     {
+        ExtendedLogger.LogInfo(GetType().Name, path.ToString());
         audioPath.Value = path;
-        ExtendedLogger.LogInfo(GetType().Name, audioPath.Value.ToString() + " burda degisir");
         SetAudioClientRpc();
 
     }
@@ -84,14 +86,11 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     [ClientRpc]
     private void SetAudioClientRpc()
     {
-        ExtendedLogger.LogInfo(GetType().Name, audioPath.Value.ToString() + " clientdir");
         AudioClip tempAudioClip = Resources.Load<AudioClip>(audioPath.Value.ToString());
         if (tempAudioClip != null)
         {
             audioSource.clip = tempAudioClip;
-            clipLength = tempAudioClip.length;
-            //set it stereo i dunno what option is better
-            audioSource.spatialBlend = 0f;
+            clipLength = tempAudioClip.length;            
             ExtendedLogger.LogInfo(GetType().Name, "Successfully set audio!");
         }
         else

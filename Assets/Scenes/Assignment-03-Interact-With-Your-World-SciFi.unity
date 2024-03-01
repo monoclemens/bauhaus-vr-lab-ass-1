@@ -1237,8 +1237,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &72393562 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7906230662120514701, guid: 9a992146ba5bab146ac4456347ed7b49, type: 3}
@@ -1291,8 +1289,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &82876911
 GameObject:
   m_ObjectHideFlags: 0
@@ -1775,8 +1771,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &95618524
 GameObject:
   m_ObjectHideFlags: 0
@@ -5066,8 +5060,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &415925725
 GameObject:
   m_ObjectHideFlags: 0
@@ -14536,8 +14528,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &1118846654
 GameObject:
   m_ObjectHideFlags: 0
@@ -16515,8 +16505,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &1318663548
 GameObject:
   m_ObjectHideFlags: 0
@@ -17411,8 +17399,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &1375643509
 GameObject:
   m_ObjectHideFlags: 0
@@ -18071,22 +18057,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
---- !u!114 &1391917990
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1391917963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cd4bc29276438b4c9d18237a5b75fad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  State:
-    m_InternalValue: 0
 --- !u!1 &1403489798
 GameObject:
   m_ObjectHideFlags: 0
@@ -18274,8 +18244,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &1417219020
 GameObject:
   m_ObjectHideFlags: 0
@@ -20153,8 +20121,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &1561721681
 GameObject:
   m_ObjectHideFlags: 0
@@ -21316,8 +21282,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1001 &1709855575
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22812,8 +22776,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &1862580651
 GameObject:
   m_ObjectHideFlags: 0
@@ -25436,8 +25398,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &1986310443
 GameObject:
   m_ObjectHideFlags: 0
@@ -25680,8 +25640,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!114 &2003010229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25729,8 +25687,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!114 &2003010230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25778,8 +25734,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!114 &2003010231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25827,8 +25781,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!114 &2003010232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25876,8 +25828,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!114 &2003010233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27334,8 +27284,6 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
-  State:
-    m_InternalValue: 1
 --- !u!1 &2127591919
 GameObject:
   m_ObjectHideFlags: 0
