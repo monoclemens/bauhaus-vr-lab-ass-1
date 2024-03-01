@@ -123,6 +123,7 @@ namespace VRSYS.Core.Networking
                     NetworkedAudioPlayer padAudioPlayer = childPad.GetChild(0).gameObject.GetComponent<NetworkedAudioPlayer>();
                     if (padAudioPlayer != null)
                     {
+                        
                         padAudioPlayer.SetAudio("samples/" + audioClips[i].name.ToString());
                         pads.Add(padAudioPlayer);
                     }
@@ -294,6 +295,7 @@ namespace VRSYS.Core.Networking
         private void UpdatePadAudio(int padIndex)
         {
             string sample_name = padDropdowns[padIndex].options[padDropdowns[padIndex].value].text;
+            
             //pad number indices should be added
             if (pads[padIndex] != null)
             {

@@ -338,10 +338,10 @@ namespace VRSYS.Core.Networking
                 StartCoroutine(HeartbeatLobbyCoroutine(lobby.Id, 15));
 
                 //to trigger the initial sequence
-                StartCoroutine(LogElapsedTimeCoroutine());
-                
+                //StartCoroutine(LogElapsedTimeCoroutine());
+
                 // Relay & Lobby are set
-                
+
                 // Set Transport data
                 Unity.Netcode.NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
                     hostData.IPv4Address,
@@ -373,7 +373,6 @@ namespace VRSYS.Core.Networking
             int timeLeft;
             //for now it is playing from the interactable cube
             NetworkedAudioPlayer initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
-            initialAudioPlayer.SetAudio("initial_seq");
             while (lobbyTimer.Elapsed.TotalSeconds < timerLength)
             {
                 yield return new WaitForSeconds(1); // Wait for 1 second
@@ -383,7 +382,8 @@ namespace VRSYS.Core.Networking
 
                     
             }
-            initialAudioPlayer.PlayAudio();
+
+            
         }
 
  

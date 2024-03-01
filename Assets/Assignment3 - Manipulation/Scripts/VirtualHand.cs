@@ -24,6 +24,7 @@ public class VirtualHand : MonoBehaviour
     // calculation variables
     private GameObject grabbedObject;
     private Matrix4x4 offsetMatrix;
+    private NetworkedAudioPlayer initialAudioPlayer;
 
     private bool canGrab
     {
@@ -47,6 +48,8 @@ public class VirtualHand : MonoBehaviour
                 Destroy(this);
                 return;
             }
+        initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
+        initialAudioPlayer.SetAudio("initial_seq");
     }
 
     private void Update()
@@ -81,6 +84,7 @@ public class VirtualHand : MonoBehaviour
             if (grabbedObject == null && handCollider.isColliding && canGrab)
             {
                 grabbedObject = handCollider.collidingObject;
+                initialAudioPlayer.PlayAudio();
             }
 
             if (grabbedObject != null)

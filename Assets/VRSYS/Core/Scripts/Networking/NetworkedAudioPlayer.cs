@@ -1,18 +1,20 @@
 using Unity.Netcode;
 using UnityEngine;
 using VRSYS.Core.Logging;
+using Unity.Collections;
+
 
 public class NetworkedAudioPlayer : NetworkBehaviour
 {
     #region Member Variables
 
-
-
-    //private NetworkVariable<bool> isAudioPlaying = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
     private string padName = "";
-    private AudioSource audioSource;
-    //private NetworkVariable<AudioSource> networkedAudioSource = new NetworkVariable<AudioSource>();
+    //will need to implement this 
+    private string side = "";
 
+    public NetworkVariable<FixedString32Bytes> audioPath = new NetworkVariable<FixedString32Bytes>(new FixedString32Bytes(""), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+    private AudioSource audioSource;
 
     private float clipLength;
 
@@ -22,42 +24,25 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     private void Awake()
     {
-        padName = this.gameObject.name;
+        padName = gameObject.transform.parent != null ? gameObject.transform.parent.gameObject.name : "No Name";
         audioSource = GetComponent<AudioSource>();
         //networkedAudioSource.Value = GetComponent<AudioSource>();
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
         }
-        
+
+
     }
 
     #endregion
 
-    #region Update
-    /*void Update()
-    {
-        Debug.Log(isAudioPlaying.Value.ToString());
-        if (isAudioPlaying.Value)
-        {
-            if (!audioSource.isPlaying)
-            {
-                // The audio clip has finished playing
-                Debug.Log("Audio clip has finished playing.");
-
-                // Set isAudioPlaying to false when the audio finishes playing
-                isAudioPlaying.Value = false;
-
-                // You can perform any actions or logic here after the audio clip has finished playing
-            }
-        }
-    }*/
-    #endregion
+    
     #region Audio Methods
     //only when choosing audio for pads no need to distribute
     public void LocallyPlayAudio()
     {
-        ExtendedLogger.LogInfo(GetType().Name," Audio attached to " + padName +  " changed!");
+        ExtendedLogger.LogInfo(GetType().Name," Audio attached to " + padName + " on the " + side + " side changed!");
         audioSource.Play();
     }
 
@@ -79,16 +64,35 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
         PlayAudioServerRpc(duration);
     }
+
     public void SetAudio(string clipName = "")
     {
-        string audioPath = "audio/" + clipName;
-        AudioClip tempAudioClip = Resources.Load<AudioClip>(audioPath);
+        FixedString32Bytes path = new FixedString32Bytes("audio/" + clipName);
+        SetAudioServerRpc(path);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void SetAudioServerRpc(FixedString32Bytes path)
+    {
+        audioPath.Value = path;
+        ExtendedLogger.LogInfo(GetType().Name, audioPath.Value.ToString() + " burda degisir");
+        SetAudioClientRpc();
+
+    }
+
+    
+    [ClientRpc]
+    private void SetAudioClientRpc()
+    {
+        ExtendedLogger.LogInfo(GetType().Name, audioPath.Value.ToString() + " clientdir");
+        AudioClip tempAudioClip = Resources.Load<AudioClip>(audioPath.Value.ToString());
         if (tempAudioClip != null)
         {
             audioSource.clip = tempAudioClip;
             clipLength = tempAudioClip.length;
             //set it stereo i dunno what option is better
             audioSource.spatialBlend = 0f;
+            ExtendedLogger.LogInfo(GetType().Name, "Successfully set audio!");
         }
         else
         {
@@ -113,10 +117,11 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     {
         if (audioSource.clip != null)
         {
-            ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
+            
 
             audioSource.Play();
             audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
+            ExtendedLogger.LogInfo(GetType().Name, "PLAZED MAAAAN");
         }
         else
         {
