@@ -23,6 +23,7 @@ public class VirtualHand : MonoBehaviour
     
     // calculation variables
     private GameObject grabbedObject;
+    private NetworkedAudioPlayer playedPad;
     private Matrix4x4 offsetMatrix;
     private NetworkedAudioPlayer initialAudioPlayer;
 
@@ -81,24 +82,15 @@ public class VirtualHand : MonoBehaviour
     {
         if (grabAction.action.IsPressed())
         {
-            if (grabbedObject == null && handCollider.isColliding && canGrab)
-            {
-                grabbedObject = handCollider.collidingObject;
-                initialAudioPlayer.PlayAudio();
-            }
-
-            if (grabbedObject != null)
-            {
-                grabbedObject.transform.position = transform.position;
-                grabbedObject.transform.rotation = transform.rotation;
-            }
+            playedPad = handCollider.collidingObject.GetComponent<NetworkedAudioPlayer>();
+            playedPad.PlayAudio();
         }
-        else if (grabAction.action.WasReleasedThisFrame())
+        /*else if (grabAction.action.WasReleasedThisFrame())
         {
             if(grabbedObject != null)
                 grabbedObject.GetComponent<ManipulationSelector>().Release();
             grabbedObject = null;
-        }
+        }*/
     }
 
     private void ReparentingGrab()
