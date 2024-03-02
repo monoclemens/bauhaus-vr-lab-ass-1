@@ -8,9 +8,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 {
     #region Member Variables
 
-    private string padName = "";
-    //will need to implement this 
-    private string side = "";
 
     public NetworkVariable<FixedString32Bytes> audioPath = new NetworkVariable<FixedString32Bytes>(new FixedString32Bytes(""), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
@@ -24,7 +21,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     private void Awake()
     {
-        padName = gameObject.transform.parent != null ? gameObject.transform.parent.gameObject.name : "No Name";
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -68,7 +65,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         }
         else
         {
-            
             SetAudioServerRpc(path);
             ExtendedLogger.LogInfo(GetType().Name, path.ToString());
         }
@@ -77,7 +73,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     //only when choosing audio for pads no need to distribute
     public void LocallyPlayAudio()
     {
-        ExtendedLogger.LogInfo(GetType().Name," Audio attached to " + padName + " on the " + side + " side changed!");
         audioSource.Play();
     }
     
@@ -88,14 +83,15 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         if (tempAudioClip != null)
         {
             audioSource.clip = tempAudioClip;
-            clipLength = tempAudioClip.length;            
-            ExtendedLogger.LogInfo(GetType().Name, "Successfully set audio!");
+            clipLength = tempAudioClip.length;
+            ExtendedLogger.LogInfo(GetType().Name, "Successfully set audio as the server!");
         }
         else
         {
             Debug.LogWarning("No such audio");
             return;
         }
+        
     }
 
     #endregion
@@ -118,7 +114,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
             audioSource.Play();
             audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
-            ExtendedLogger.LogInfo(GetType().Name, "PLAZED MAAAAN");
         }
         else
         {
@@ -131,7 +126,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         ExtendedLogger.LogInfo(GetType().Name, path.ToString());
         audioPath.Value = path;
         SetAudioClientRpc();
-
     }
 
     
@@ -143,7 +137,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         {
             audioSource.clip = tempAudioClip;
             clipLength = tempAudioClip.length;            
-            ExtendedLogger.LogInfo(GetType().Name, "Successfully set audio!");
+            ExtendedLogger.LogInfo(GetType().Name, "Successfully set audio and distributed!");
         }
         else
         {

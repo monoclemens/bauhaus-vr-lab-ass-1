@@ -20,9 +20,10 @@ public class MadPads_Pad : NetworkBehaviour
     public UnityEvent onTouch;
     public UnityEvent onLeave;
     private Color _initialColor;
+    private string padName;
 
-    
-    
+
+
     // Distribute the triangle color, too, to show the color of the pad.
     public NetworkVariable<Color> color = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
@@ -32,6 +33,8 @@ public class MadPads_Pad : NetworkBehaviour
     // A networked variable to keep track of who touches a pad.
     //changed it to ulong to have the client id serialized not the gameobject 
     private readonly NetworkVariable<ulong> touchingPlayer = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    //NetworkedAudioPlayer audioPlayer;
 
     // A singleton for the renderer with a corresponding getter.
     private Renderer _renderer;
@@ -97,7 +100,10 @@ public class MadPads_Pad : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("Pad " + gameObject.name + " checking in!");
+        padName = gameObject.transform.parent != null ? gameObject.transform.parent.gameObject.name : "No Name";
+        //uglyyy i know
+        padName += gameObject.transform.parent.transform.parent != null ? gameObject.transform.parent.transform.parent.transform.parent.gameObject.name : "No Name";
+        Debug.Log("Pad " + padName + " checking in!");
 
         // Here we distribute a bool, this might be unnecessary and we could probably just initialite it with false.
         isTouched.Value = false;
@@ -125,6 +131,8 @@ public class MadPads_Pad : NetworkBehaviour
          * TODO: We might need to "subtract" it on destroy. Check!
          */
         color.OnValueChanged += OnColorChanged;
+
+
     }
 
     // The listener changing the triangle color.
