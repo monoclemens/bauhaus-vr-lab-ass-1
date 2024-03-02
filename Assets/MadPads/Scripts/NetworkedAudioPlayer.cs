@@ -10,6 +10,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
 
     public NetworkVariable<FixedString32Bytes> audioPath = new NetworkVariable<FixedString32Bytes>(new FixedString32Bytes(""), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<bool> isPlaying = new NetworkVariable<bool>(false , NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private AudioSource audioSource;
 
@@ -33,11 +34,19 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     #endregion
 
-    
-    #region Audio Methods
-    
 
-    public void PlayAudio(double duration = 0)
+    #region Audio Methods
+
+    private bool sourcePlaying
+    {
+        get
+        {
+            return audioSource.isPlaying;
+        }
+    }
+
+    
+    public void PlayAudio(double duration)
     {
         /*if (isAudioPlaying.Value)
         {
@@ -110,8 +119,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     {
         if (audioSource.clip != null)
         {
-            
-
             audioSource.Play();
             audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
         }

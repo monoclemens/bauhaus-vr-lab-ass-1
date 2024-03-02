@@ -1237,6 +1237,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &71547029
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1325,6 +1327,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &72393576
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1772,6 +1776,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &88974409
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5173,6 +5179,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &391918103
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8818,6 +8826,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &694240746
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9880,6 +9890,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &762559509
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -11447,6 +11459,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &904791003
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -12056,36 +12070,6 @@ Transform:
   m_Father: {fileID: 2526482838266129142}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &926280448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 97577792}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!1 &930553550
 GameObject:
   m_ObjectHideFlags: 0
@@ -13296,6 +13280,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1001093599
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -16042,6 +16028,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1231336586
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -17971,6 +17959,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1374455110
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -18665,6 +18655,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!1 &1403489798
 GameObject:
   m_ObjectHideFlags: 0
@@ -18852,6 +18844,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1410448131
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -20765,6 +20759,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1556896930
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -21845,6 +21841,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1628170874
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -21928,6 +21926,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1628170877
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -22319,6 +22319,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1682499764
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -23390,6 +23392,41 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_AlphaFadeSpeed: 0.15
+--- !u!1 &1834692622 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8641861032417260824, guid: 9a992146ba5bab146ac4456347ed7b49, type: 3}
+  m_PrefabInstance: {fileID: 854125172}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1834692623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1834692622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 1
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &1835720609
 GameObject:
   m_ObjectHideFlags: 0
@@ -24623,6 +24660,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &1890564923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 97577792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2868252ab5c4d1da357e8f11f1b524, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 1
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &1894681009
 GameObject:
   m_ObjectHideFlags: 0
@@ -26242,6 +26309,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1976384465
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -26507,6 +26576,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!54 &1982777502
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -28055,6 +28126,8 @@ MonoBehaviour:
         byte0027: 0
         byte0028: 0
         byte0029: 0
+  isPlaying:
+    m_InternalValue: 0
 --- !u!114 &2122081376
 MonoBehaviour:
   m_ObjectHideFlags: 0

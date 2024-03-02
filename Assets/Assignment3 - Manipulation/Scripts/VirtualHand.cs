@@ -8,7 +8,7 @@ public class VirtualHand : MonoBehaviour
 
     private enum VirtualHandsMethod 
     {
-        Snap,
+        Hitting,
         Reparenting,
         Calculation
     }
@@ -23,7 +23,7 @@ public class VirtualHand : MonoBehaviour
     
     // calculation variables
     private GameObject grabbedObject;
-    private NetworkedAudioPlayer playedPad;
+    private MadPads_Pad playedPad;
     private Matrix4x4 offsetMatrix;
     private NetworkedAudioPlayer initialAudioPlayer;
 
@@ -62,8 +62,8 @@ public class VirtualHand : MonoBehaviour
         
         switch (grabMethod)
         {
-            case VirtualHandsMethod.Snap:
-                SnapGrab();
+            case VirtualHandsMethod.Hitting:
+                Hitting();
                 break;
             case VirtualHandsMethod.Reparenting:
                 ReparentingGrab();
@@ -78,12 +78,12 @@ public class VirtualHand : MonoBehaviour
 
     #region Grab Methods
 
-    private void SnapGrab()
+    private void Hitting()
     {
         if (grabAction.action.WasPressedThisFrame() && handCollider.isColliding)
         {
-            playedPad = handCollider.collidingObject.GetComponent<NetworkedAudioPlayer>();
-            playedPad.PlayAudio();
+            playedPad = handCollider.collidingObject.GetComponent<MadPads_Pad>();
+            playedPad.Play(NetworkManager.Singleton.LocalClientId);
         }
 
         
