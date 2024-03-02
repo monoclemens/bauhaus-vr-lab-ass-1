@@ -34,8 +34,6 @@ public class MadPads_Pad : NetworkBehaviour
     //changed it to ulong to have the client id serialized not the gameobject 
     private readonly NetworkVariable<ulong> touchingPlayer = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    //NetworkedAudioPlayer audioPlayer;
-
     // A singleton for the renderer with a corresponding getter.
     private Renderer _renderer;
     public Renderer Renderer
