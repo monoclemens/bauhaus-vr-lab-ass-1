@@ -80,11 +80,13 @@ public class VirtualHand : MonoBehaviour
 
     private void SnapGrab()
     {
-        if (grabAction.action.IsPressed())
+        if (grabAction.action.WasPressedThisFrame() && handCollider.isColliding)
         {
             playedPad = handCollider.collidingObject.GetComponent<NetworkedAudioPlayer>();
             playedPad.PlayAudio();
         }
+
+        
         /*else if (grabAction.action.WasReleasedThisFrame())
         {
             if(grabbedObject != null)
