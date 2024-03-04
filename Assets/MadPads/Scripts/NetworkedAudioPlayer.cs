@@ -65,22 +65,17 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     }
 
     
-    public void PlayAudio(double duration)
+    public void PlayAudio(double duration = 0)
     {
-        /*if (isAudioPlaying.Value)
-        {
-            Debug.LogWarning("Audio is already playing.");
-            return;
-        }*/
-        //the initial recognizable sequence
+        
         if (duration == 0)
         {
             duration = clipLength;
         }
 
 
-        //isAudioPlaying.Value = true;
-        ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
+        //a server RPC is needed for all the clients to be able to call this and alert the server
+        //which will in turn make all the clients call the PlayAudioClientRpc
         PlayAudioServerRpc(duration);
     }
 
@@ -99,7 +94,8 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         }
     }
 
-    //only when choosing audio for pads no need to distribute
+    //only when choosing audio for pads cannot distribute because the server is not yet initiated
+    //so we need to do it in sync with the start button
     public void LocallyPlayAudio()
     {
         audioSource.Play();
@@ -126,11 +122,10 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     #endregion
 
     #region RPCs
-    //not needed!!! just bypass it and go from the local play to client
+
     [ServerRpc(RequireOwnership = false)]
     private void PlayAudioServerRpc(double duration)
     {
-        ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
         PlayAudioClientRpc(duration);
     }
 
@@ -141,18 +136,19 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         {
             audioSource.Play();
             audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
+            ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
         }
         else
         {
             Debug.LogError("Audio clip not found. Make sure the file path is correct.");
         }
     }
+
     [ServerRpc(RequireOwnership = false)]
     private void SetAudioServerRpc(FixedString32Bytes path)
     {
         ExtendedLogger.LogInfo(GetType().Name, path.ToString());
         audioPath.Value = path;
-        SetAudioClientRpc(path);
     }
 
     
@@ -176,8 +172,12 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void SyncServerRpc()
     {
-        audioPath.Value = uiAudioPath;
-        ExtendedLogger.LogInfo(GetType().Name, "change to " + audioPath.Value.ToString());
+        if(syncNeeded)
+        {
+            audioPath.Value = uiAudioPath;
+            ExtendedLogger.LogInfo(GetType().Name, "Audio synced to " + audioPath.Value.ToString());
+        }
+        
     }
 
 

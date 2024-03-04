@@ -1239,6 +1239,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &71547029
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1329,6 +1330,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &72393576
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1778,6 +1780,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &88974409
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5181,6 +5184,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &391918103
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8828,6 +8832,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &694240746
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9892,6 +9897,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &762559509
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -11461,6 +11467,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &904791003
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -13282,6 +13289,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1001093599
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -16030,6 +16038,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1231336586
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -17961,6 +17970,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1374455110
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -18657,6 +18667,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!1 &1403489798
 GameObject:
   m_ObjectHideFlags: 0
@@ -18846,6 +18857,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1410448131
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -20761,6 +20773,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1556896930
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -21843,6 +21856,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1628170874
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -21928,6 +21942,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1628170877
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -22321,6 +22336,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1682499764
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -22975,6 +22991,51 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!1 &1758378711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1758378713}
+  - component: {fileID: 1758378712}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1758378712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1758378711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8227bc86c3b691b4cbb79ebbf842a3dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  padAudioPlayers: []
+--- !u!4 &1758378713
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1758378711}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.34460735, y: 0.84119654, z: -0.20366335}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 13
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1792233701
 GameObject:
   m_ObjectHideFlags: 0
@@ -26311,6 +26372,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1976384465
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -26578,6 +26640,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!54 &1982777502
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -28128,6 +28191,7 @@ MonoBehaviour:
         byte0029: 0
   isPlaying:
     m_InternalValue: 0
+  syncNeeded: 0
 --- !u!114 &2122081376
 MonoBehaviour:
   m_ObjectHideFlags: 0

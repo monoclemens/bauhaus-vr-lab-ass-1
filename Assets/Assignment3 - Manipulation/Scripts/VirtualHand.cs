@@ -26,8 +26,12 @@ public class VirtualHand : MonoBehaviour
     // calculation variables
     private GameObject grabbedObject;
     private MadPads_Pad playedPad;
+    private GameObject hitObject;
     private Matrix4x4 offsetMatrix;
-    private NetworkedAudioPlayer initialAudioPlayer;
+
+    public delegate void CollisionEventHandler(GameObject collidedObject);
+    public static event CollisionEventHandler OnCollision;
+
 
     private bool canGrab
     {
@@ -51,8 +55,7 @@ public class VirtualHand : MonoBehaviour
                 Destroy(this);
                 return;
             }
-        //initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
-        //initialAudioPlayer.SetAudio("initial_seq");
+        
     }
 
     private void Update()
@@ -84,15 +87,27 @@ public class VirtualHand : MonoBehaviour
     {
         if (grabAction.action.WasPressedThisFrame() && handCollider.isColliding)
         {
-            playedPad = handCollider.collidingObject.GetComponent<MadPads_Pad>();
-            playedPad.Sync();
-            playedPad.Play(NetworkManager.Singleton.LocalClientId);
+            hitObject = handCollider.collidingObject;
+            OnCollision?.Invoke(hitObject);
+            if (hitObject.GetComponent<MadPads_Pad>() != null)
+            {
+                playedPad = hitObject.GetComponent<MadPads_Pad>();
+                playedPad.Play();
+
+                // Invoke the event with the collided object
+                
+            }
+            else
+            {
+                //if something other than a pad is hit
+                //Debug.Log(hitObject.name);
+                //hitObject.GetComponent<NetworkedAudioPlayer>().PlayAudio();
+                return;
+            }
+            
+            
         }
-        else if(grabAction.action.WasPressedThisFrame())
-        {
-            ExtendedLogger.LogInfo(GetType().Name, "girdik");
-            //there should be a game manager
-        }
+        
         
         /*else if (grabAction.action.WasReleasedThisFrame())
         {

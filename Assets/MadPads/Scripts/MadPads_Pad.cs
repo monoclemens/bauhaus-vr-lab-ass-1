@@ -81,7 +81,6 @@ public class MadPads_Pad : NetworkBehaviour
     //function calling a networkedaudioplayer method
     public void Play(ulong playingID = 1000, double duration = 0)
     {
-        SetValuesServerRpc(playingID);
         audioPlayer.PlayAudio(duration);
     }
 
@@ -100,7 +99,7 @@ public class MadPads_Pad : NetworkBehaviour
             : _initialColor;
     }
     #region RPCs
-    [ServerRpc(RequireOwnership = false)]
+    /*[ServerRpc(RequireOwnership = false)]
     private void SetValuesServerRpc(ulong playingID)
     {
         if(playingID == 1000)
@@ -111,7 +110,7 @@ public class MadPads_Pad : NetworkBehaviour
         playing.Value = true;
         touchingPlayer.Value = playingID;
         Debug.LogWarning(playingID.ToString() + "is playing!");
-    }
+    }*/
 
     //server checks if sync needed and forwards the updated path to clients
     public void Sync()

@@ -92,6 +92,8 @@ namespace VRSYS.Core.Networking
         private List<AudioClip> audioClips = new List<AudioClip>();
         public List<NetworkedAudioPlayer> pads;
 
+        private GameManager gameManager;
+
 
         private NetworkUserSpawnInfo spawnInfo => ConnectionManager.Instance.userSpawnInfo;
 
@@ -101,6 +103,9 @@ namespace VRSYS.Core.Networking
 
         private void Start()
         {
+
+            gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
             userRoles = Enum.GetValues(typeof(UserRole)).Cast<UserRole>().ToList();
             foreach (var unavailableUserRole in unavailableUserRoles)
                 userRoles.Remove(unavailableUserRole);
@@ -124,6 +129,7 @@ namespace VRSYS.Core.Networking
                     if (padAudioPlayer != null)
                     {
                         pads.Add(padAudioPlayer);
+                        
                     }
                     else
                     {
@@ -131,6 +137,7 @@ namespace VRSYS.Core.Networking
                     }
                 }
                 
+
             }
             for (int i = 0; i < pads.Count; i++)
             {
@@ -138,7 +145,8 @@ namespace VRSYS.Core.Networking
                 //will sync once client joins the session
                 pads[i].SetAudio("samples/" + audioClips[i].name.ToString());
             }
-            
+            gameManager.getPads(pads);
+
 
             if (ConnectionManager.Instance.lobbySettings.autoStart)
             {
