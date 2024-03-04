@@ -1,6 +1,8 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using VRSYS.Core.Logging;
+
 
 public class VirtualHand : MonoBehaviour
 {
@@ -49,8 +51,8 @@ public class VirtualHand : MonoBehaviour
                 Destroy(this);
                 return;
             }
-        initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
-        initialAudioPlayer.SetAudio("initial_seq");
+        //initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
+        //initialAudioPlayer.SetAudio("initial_seq");
     }
 
     private void Update()
@@ -83,9 +85,14 @@ public class VirtualHand : MonoBehaviour
         if (grabAction.action.WasPressedThisFrame() && handCollider.isColliding)
         {
             playedPad = handCollider.collidingObject.GetComponent<MadPads_Pad>();
+            playedPad.Sync();
             playedPad.Play(NetworkManager.Singleton.LocalClientId);
         }
-
+        else if(grabAction.action.WasPressedThisFrame())
+        {
+            ExtendedLogger.LogInfo(GetType().Name, "girdik");
+            //there should be a game manager
+        }
         
         /*else if (grabAction.action.WasReleasedThisFrame())
         {

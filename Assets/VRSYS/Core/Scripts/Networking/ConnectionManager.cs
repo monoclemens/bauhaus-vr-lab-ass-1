@@ -462,7 +462,12 @@ namespace VRSYS.Core.Networking
 
                 if (verbose)
                 {
+                    //will need to add a server RPC here to update pad info
+                    //the server needs to send each client what their audioPath needs to be
+                    //which will then be set as audioSource.clip
+                    string audioPath = GameObject.Find("MadPads").transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<NetworkedAudioPlayer>().audioPath.Value.ToString();
                     ExtendedLogger.LogInfo(GetType().Name, "joined lobby: " + lobby.Id);
+                    ExtendedLogger.LogInfo(GetType().Name, "sample " + audioPath);
                     ExtendedLogger.LogInfo(GetType().Name, "lobby players: " + lobby.Players.Capacity);
                 }
                 

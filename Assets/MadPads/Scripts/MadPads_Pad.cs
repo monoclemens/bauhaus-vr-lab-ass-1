@@ -112,6 +112,12 @@ public class MadPads_Pad : NetworkBehaviour
         touchingPlayer.Value = playingID;
         Debug.LogWarning(playingID.ToString() + "is playing!");
     }
+
+    //server checks if sync needed and forwards the updated path to clients
+    public void Sync()
+    {
+        audioPlayer.SyncServerRpc();
+    }
     #endregion
     #region Rendering
     // A singleton for the renderer with a corresponding getter.

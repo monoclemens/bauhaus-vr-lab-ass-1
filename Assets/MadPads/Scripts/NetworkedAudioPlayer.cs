@@ -2,6 +2,8 @@ using Unity.Netcode;
 using UnityEngine;
 using VRSYS.Core.Logging;
 using Unity.Collections;
+using UnityEngine.InputSystem;
+
 
 
 public class NetworkedAudioPlayer : NetworkBehaviour
@@ -12,9 +14,14 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     public NetworkVariable<FixedString32Bytes> audioPath = new NetworkVariable<FixedString32Bytes>(new FixedString32Bytes(""), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public NetworkVariable<bool> isPlaying = new NetworkVariable<bool>(false , NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    private AudioSource audioSource;
+    public bool syncNeeded = false;
 
+    private AudioSource audioSource;
     private float clipLength;
+    private FixedString32Bytes uiAudioPath;
+    //for those pads whose samples were changed before the start of the server
+    
+
 
     #endregion
 
@@ -22,7 +29,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     private void Awake()
     {
-
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
@@ -32,10 +38,23 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     }
 
+    private void Update()
+    {
+        audioPath.OnValueChanged += (prev, curr) =>
+        {
+            if(syncNeeded)
+            {
+                syncNeeded = false;
+                SetAudioClientRpc(curr);
+            }
+
+        };
+    }
+
     #endregion
 
 
-    #region Audio Methods
+        #region Audio Methods
 
     private bool sourcePlaying
     {
@@ -70,6 +89,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         FixedString32Bytes path = new FixedString32Bytes("audio/" + clipName);
         if(clipName.StartsWith("samples/"))
         {
+            syncNeeded = true;
             LocallySetAudio(path);
         }
         else
@@ -87,8 +107,8 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     
     public void LocallySetAudio(FixedString32Bytes path)
     {
-        audioPath.Value = path;
-        AudioClip tempAudioClip = Resources.Load<AudioClip>(audioPath.Value.ToString());
+        uiAudioPath = path;
+        AudioClip tempAudioClip = Resources.Load<AudioClip>(uiAudioPath.ToString());
         if (tempAudioClip != null)
         {
             audioSource.clip = tempAudioClip;
@@ -132,14 +152,15 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     {
         ExtendedLogger.LogInfo(GetType().Name, path.ToString());
         audioPath.Value = path;
-        SetAudioClientRpc();
+        SetAudioClientRpc(path);
     }
 
     
     [ClientRpc]
-    private void SetAudioClientRpc()
+    public void SetAudioClientRpc(FixedString32Bytes path)
     {
-        AudioClip tempAudioClip = Resources.Load<AudioClip>(audioPath.Value.ToString());
+        ExtendedLogger.LogInfo(GetType().Name, "did it change? " + path.ToString());
+        AudioClip tempAudioClip = Resources.Load<AudioClip>(path.ToString());
         if (tempAudioClip != null)
         {
             audioSource.clip = tempAudioClip;
@@ -152,6 +173,13 @@ public class NetworkedAudioPlayer : NetworkBehaviour
             return;
         }
     }
+    [ServerRpc(RequireOwnership = false)]
+    public void SyncServerRpc()
+    {
+        audioPath.Value = uiAudioPath;
+        ExtendedLogger.LogInfo(GetType().Name, "change to " + audioPath.Value.ToString());
+    }
+
 
     #endregion
 }
