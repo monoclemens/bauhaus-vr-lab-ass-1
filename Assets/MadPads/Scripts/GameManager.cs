@@ -21,12 +21,17 @@ public class GameManager : NetworkBehaviour
     {
         getPads();
         startButton = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
-        sequence.Push(new Tuple<string, double>("Pad_TopLeftLeftPads", 1.0));
-        sequence.Push(new Tuple<string, double>("Pad_TopLeftRightPads", 2.0));
+
+        sequence.Push(new Tuple<string, double>("Pad_TopLeftRightPads", 2.4));
+        sequence.Push(new Tuple<string, double>("Pad_BottomRightRightPads", 0.8));
+        sequence.Push(new Tuple<string, double>("Pad_BottomLeftRightPads", 0.8));
+        sequence.Push(new Tuple<string, double>("Pad_CenterCenterRightPads", 0.4));
         sequence.Push(new Tuple<string, double>("Pad_TopCenterLeftPads", 0.4));
-        sequence.Push(new Tuple<string, double>("Pad_BottomRightRightPads", 2.4));
-        sequence.Push(new Tuple<string, double>("Pad_CenterLeftLeftPads", 1.6));
-        sequence.Push(new Tuple<string, double>("Pad_BottomLeftLeftPads", 1.2));
+        sequence.Push(new Tuple<string, double>("Pad_CenterCenterRightPads", 0.8));
+        sequence.Push(new Tuple<string, double>("Pad_BottomLeftRightPads", 0.8));
+        sequence.Push(new Tuple<string, double>("Pad_TopLeftRightPads", 1.6));
+        sequence.Push(new Tuple<string, double>("Pad_CenterCenterLeftPads", 0.8));
+        sequence.Push(new Tuple<string, double>("Pad_TopLeftLeftPads", 0.8));
         VirtualHand.OnCollision += HandleCollision;
     }
 
