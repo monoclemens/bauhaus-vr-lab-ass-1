@@ -30,6 +30,7 @@ public class VirtualHand : MonoBehaviour
     private Matrix4x4 offsetMatrix;
 
     public delegate void CollisionEventHandler(GameObject collidedObject);
+    //the thing that communicates with the game manager
     public static event CollisionEventHandler OnCollision;
 
 
@@ -89,32 +90,9 @@ public class VirtualHand : MonoBehaviour
         {
             hitObject = handCollider.collidingObject;
             OnCollision?.Invoke(hitObject);
-            if (hitObject.GetComponent<MadPads_Pad>() != null)
-            {
-                playedPad = hitObject.GetComponent<MadPads_Pad>();
-                playedPad.Play();
 
-                // Invoke the event with the collided object
-                
-            }
-            else
-            {
-                //if something other than a pad is hit
-                //Debug.Log(hitObject.name);
-                //hitObject.GetComponent<NetworkedAudioPlayer>().PlayAudio();
-                return;
-            }
-            
-            
         }
         
-        
-        /*else if (grabAction.action.WasReleasedThisFrame())
-        {
-            if(grabbedObject != null)
-                grabbedObject.GetComponent<ManipulationSelector>().Release();
-            grabbedObject = null;
-        }*/
     }
 
     private void ReparentingGrab()
