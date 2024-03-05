@@ -2,7 +2,7 @@ using Unity.Netcode;
 using UnityEngine;
 using VRSYS.Core.Logging;
 using Unity.Collections;
-using UnityEngine.InputSystem;
+using System.Collections;
 
 
 
@@ -117,6 +117,22 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         
     }
 
+    private IEnumerator FadeOut(float duration, float fadeTime = 0.1f)
+    {
+        float startVolume = audioSource.volume;
+        float waitTime = duration - fadeTime;
+        yield return new WaitForSeconds(waitTime);
+        while (audioSource.volume > 0)
+        {
+            audioSource.volume -= startVolume * Time.deltaTime / fadeTime;
+
+            yield return null;
+        }
+
+        audioSource.Stop();
+        audioSource.volume = startVolume;
+    }
+
     #endregion
 
     #region RPCs
@@ -132,9 +148,9 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     {
         if (audioSource.clip != null)
         {
+            StartCoroutine(FadeOut((float)duration));
             audioSource.Play();
             audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
-            
         }
         else
         {
@@ -153,7 +169,6 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     [ClientRpc]
     public void SetAudioClientRpc(FixedString32Bytes path)
     {
-        ExtendedLogger.LogInfo(GetType().Name, "did it change? " + path.ToString());
         AudioClip tempAudioClip = Resources.Load<AudioClip>(path.ToString());
         if (tempAudioClip != null)
         {
