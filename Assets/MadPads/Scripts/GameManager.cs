@@ -8,15 +8,19 @@ public class GameManager : NetworkBehaviour
 {
     private Dictionary<string, MadPads_Pad> padMap = new Dictionary<string, MadPads_Pad>();
     private Stack<Tuple<string, double>> sequence = new Stack<Tuple<string, double>>();
+    private double sequenceLength;
 
 
     private NetworkedAudioPlayer startButton;
+
+    private bool firstStart = false;
     void Start()
     {
         getPads();
         startButton = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
         sequence.Push(new Tuple<string, double>("Pad_TopLeftLeftPads", 1.0));
         sequence.Push(new Tuple<string, double>("Pad_TopLeftRightPads", 2.0));
+        sequenceLength = 9.6;
         VirtualHand.OnCollision += HandleCollision;
     }
 
@@ -62,15 +66,21 @@ public class GameManager : NetworkBehaviour
             //first start should be the initial sequence
             //starts after the first should be new Random sequence generation
             //play the random sequence
-            Debug.Log("Game is Starting");
-            foreach (var kvp in padMap)
+            if(!firstStart)
             {
-                MadPads_Pad pad = kvp.Value;
-                pad.Sync();
+                firstStart = true;
+                Debug.Log("Game is Starting");
+                foreach (var kvp in padMap)
+                {
+                    MadPads_Pad pad = kvp.Value;
+                    pad.Sync();
+                }
+            }
+            else
+            {
+                sequence = RandomSequenceGenerator();
             }
             SequencePlayer(sequence);
-
-
         }
         
     }
@@ -107,9 +117,12 @@ public class GameManager : NetworkBehaviour
             Debug.LogError($"Sample with name '{sampleName}' not found in the dictionary.");
         }
     }
-    private void RandomSequenceGenerator(GameObject collidedObject)
+    private Stack<Tuple<string, double>> RandomSequenceGenerator()
     {
+        Stack<Tuple<string, double>> randomSequence = new Stack<Tuple<string, double>>();
 
+
+        return randomSequence;
 
     }
 }

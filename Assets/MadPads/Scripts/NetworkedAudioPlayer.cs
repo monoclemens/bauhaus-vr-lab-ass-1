@@ -103,13 +103,11 @@ public class NetworkedAudioPlayer : NetworkBehaviour
     
     public void LocallySetAudio(FixedString32Bytes path)
     {
-        uiAudioPath = path;
-        AudioClip tempAudioClip = Resources.Load<AudioClip>(uiAudioPath.ToString());
+        
+        AudioClip tempAudioClip = Resources.Load<AudioClip>(path.ToString());
         if (tempAudioClip != null)
         {
-            audioSource.clip = tempAudioClip;
-            clipLength = tempAudioClip.length;
-            ExtendedLogger.LogInfo(GetType().Name, "Successfully set audio as the server!");
+            uiAudioPath = path;
         }
         else
         {
