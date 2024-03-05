@@ -83,7 +83,7 @@ public class VirtualHand : MonoBehaviour
     #endregion
 
     #region Grab Methods
-
+    //TO:DO we need to implement the actual hitting for now it is only like grab without grabbing
     private void Hitting()
     {
         if (grabAction.action.WasPressedThisFrame() && handCollider.isColliding)
