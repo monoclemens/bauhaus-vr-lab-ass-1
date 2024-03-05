@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Collections;
-using static VirtualHand;
+using Random = UnityEngine.Random;
+
+
 public class GameManager : NetworkBehaviour
 {
     private Dictionary<string, MadPads_Pad> padMap = new Dictionary<string, MadPads_Pad>();
     private Stack<Tuple<string, double>> sequence = new Stack<Tuple<string, double>>();
-    private double sequenceLength;
+    private double sequenceLength = 9.6;
+    private List<double> possibleDurations = new List<double> { 0.4, 0.8, 1.6, 2.4 };
 
 
     private NetworkedAudioPlayer startButton;
@@ -20,7 +23,10 @@ public class GameManager : NetworkBehaviour
         startButton = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
         sequence.Push(new Tuple<string, double>("Pad_TopLeftLeftPads", 1.0));
         sequence.Push(new Tuple<string, double>("Pad_TopLeftRightPads", 2.0));
-        sequenceLength = 9.6;
+        sequence.Push(new Tuple<string, double>("Pad_TopCenterLeftPads", 0.4));
+        sequence.Push(new Tuple<string, double>("Pad_BottomRightRightPads", 2.4));
+        sequence.Push(new Tuple<string, double>("Pad_CenterLeftLeftPads", 1.6));
+        sequence.Push(new Tuple<string, double>("Pad_BottomLeftLeftPads", 1.2));
         VirtualHand.OnCollision += HandleCollision;
     }
 
@@ -98,7 +104,7 @@ public class GameManager : NetworkBehaviour
 
             
             StartCoroutine(PlaySampleCoroutine(sampleName, sampleDuration, prevDuration));
-            prevDuration = sampleDuration;
+            prevDuration += sampleDuration;
         }
 
     }
@@ -109,7 +115,7 @@ public class GameManager : NetworkBehaviour
         // Check if the key exists in the dictionary
         if (padMap.ContainsKey(sampleName))
         {
-            yield return new WaitForSeconds((float)prevDuration); // Wait for 1 second
+            yield return new WaitForSeconds((float)prevDuration);
             padMap[sampleName].Play(sampleDuration);
         }
         else
@@ -120,7 +126,29 @@ public class GameManager : NetworkBehaviour
     private Stack<Tuple<string, double>> RandomSequenceGenerator()
     {
         Stack<Tuple<string, double>> randomSequence = new Stack<Tuple<string, double>>();
+        double remainingSum = sequenceLength;
 
+        List<string> padKeys = new List<string>(padMap.Keys);
+
+        while (remainingSum >= 0.4)
+        {
+            int randomSampleIndex = Random.Range(0, padMap.Count);
+            string randomSample = padKeys[randomSampleIndex];
+
+            double randomDuration = possibleDurations[Random.Range(0, possibleDurations.Count)];
+
+            if (randomDuration <= remainingSum)
+            {
+                remainingSum -= randomDuration;
+                randomSequence.Push(new Tuple<string, double>(randomSample, randomDuration));
+                Debug.Log($"Sample with name '{randomSample}' with the duration: {randomDuration} with the remaining secs {remainingSum}");
+            }
+            
+
+            
+            
+
+        }
 
         return randomSequence;
 

@@ -82,6 +82,7 @@ public class MadPads_Pad : NetworkBehaviour
     public void Play(double duration = 0 , ulong playingID = 1000)
     {
         audioPlayer.PlayAudio(duration);
+        Debug.Log(duration.ToString() + padName);
     }
 
     // The listener changing the triangle color.

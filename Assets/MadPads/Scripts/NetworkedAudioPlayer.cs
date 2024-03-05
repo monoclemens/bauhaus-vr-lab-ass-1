@@ -134,7 +134,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
         {
             audioSource.Play();
             audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
-            ExtendedLogger.LogInfo(GetType().Name, duration.ToString());
+            
         }
         else
         {
