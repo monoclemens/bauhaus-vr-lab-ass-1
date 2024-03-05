@@ -20,7 +20,7 @@ public class MadPads_Pad : NetworkBehaviour
     public UnityEvent onTouch;
     public UnityEvent onLeave;
     private Color _initialColor;
-    private string padName;
+    public string padName;
 
 
 
@@ -79,7 +79,7 @@ public class MadPads_Pad : NetworkBehaviour
 
     }
     //function calling a networkedaudioplayer method
-    public void Play(ulong playingID = 1000, double duration = 0)
+    public void Play(double duration = 0 , ulong playingID = 1000)
     {
         audioPlayer.PlayAudio(duration);
     }

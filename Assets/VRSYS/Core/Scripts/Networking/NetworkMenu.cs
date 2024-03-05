@@ -145,7 +145,7 @@ namespace VRSYS.Core.Networking
                 //will sync once client joins the session
                 pads[i].SetAudio("samples/" + audioClips[i].name.ToString());
             }
-            gameManager.getPads(pads);
+            
 
 
             if (ConnectionManager.Instance.lobbySettings.autoStart)
@@ -156,6 +156,8 @@ namespace VRSYS.Core.Networking
             
             SetupUIElements();
             SetupUIEvents();
+
+            
         }
 
         #endregion
