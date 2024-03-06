@@ -74,9 +74,6 @@ namespace VRSYS.Core.Networking
         public Button createLobbyButton;
         public Button backButton;
         public TextMeshProUGUI stateText;
-        //pad dropdowns
-        public List<TMP_Dropdown> padDropdowns = new List<TMP_Dropdown>(18);
-        
 
         [Header("Lobby Tiles")] 
         public GameObject lobbyTilePrefab;
@@ -88,12 +85,18 @@ namespace VRSYS.Core.Networking
         public List<UserRole> unavailableUserRoles;
         private List<UserRole> userRoles;
 
-        //the list to store sample file names
+        /***BEGIN TEAM JAIME***
+         * 
+         * The list to store sample file names.
+         */
         private List<AudioClip> audioClips = new List<AudioClip>();
         public List<NetworkedAudioPlayer> pads;
-
         private GameManager gameManager;
 
+        // Pad dropdowns.
+        public List<TMP_Dropdown> padDropdowns = new List<TMP_Dropdown>(18);
+
+        // END TEAM JAIME
 
         private NetworkUserSpawnInfo spawnInfo => ConnectionManager.Instance.userSpawnInfo;
 
@@ -110,14 +113,16 @@ namespace VRSYS.Core.Networking
             foreach (var unavailableUserRole in unavailableUserRoles)
                 userRoles.Remove(unavailableUserRole);
 
-
-            //get the names of audio files in the dedicated directory
-            //to have them as options
+            /***BEGIN TEAM JAIME***
+             * 
+             * Get the names of audio files in the dedicated directory to have them as options.
+             */
             audioClips = Resources.LoadAll<AudioClip>("audio/samples").ToList();
 
-            //find the parent of the grids
+            // Find the parent of the grids.
             Transform grids = GameObject.Find("MadPads").transform;
-            //add all pads into the pads list to then assign the audios
+
+            // Add all pads into the pads list to then assign the audios.
             foreach (Transform padsGroup in grids)
             {
                 Transform grid = padsGroup.GetChild(0);
@@ -126,6 +131,7 @@ namespace VRSYS.Core.Networking
                     // Access the i-th child
                     Transform childPad = grid.GetChild(i);
                     NetworkedAudioPlayer padAudioPlayer = childPad.GetChild(0).gameObject.GetComponent<NetworkedAudioPlayer>();
+
                     if (padAudioPlayer != null)
                     {
                         pads.Add(padAudioPlayer);
@@ -136,18 +142,17 @@ namespace VRSYS.Core.Networking
                         Debug.LogWarning("childPad is null");
                     }
                 }
-                
-
             }
+
             for (int i = 0; i < pads.Count; i++)
             {
-                //will do it locally cause the server is not started 
-                //will sync once client joins the session
+                // Will do it locally cause the server is not started yet.
+                // Will sync once client joins the session.
                 pads[i].SetAudio("samples/" + audioClips[i].name.ToString());
             }
+
+            // END TEAM JAIME
             
-
-
             if (ConnectionManager.Instance.lobbySettings.autoStart)
             {
                 gameObject.SetActive(false);
@@ -156,8 +161,6 @@ namespace VRSYS.Core.Networking
             
             SetupUIElements();
             SetupUIEvents();
-
-            
         }
 
         #endregion
@@ -303,20 +306,23 @@ namespace VRSYS.Core.Networking
             createLobbySection.SetActive(false);
         }
 
+        // BEGIN TEAM JAIME
         private void UpdatePadAudio(int padIndex)
         {
-            string sample_name = padDropdowns[padIndex].options[padDropdowns[padIndex].value].text;
+            string sample_name = padDropdowns[padIndex]
+                .options[padDropdowns[padIndex].value]
+                .text;
             
-            //pad number indices should be added
+            // TODO: Pad number indices should be added.
             if (pads[padIndex] != null)
             {
                 ExtendedLogger.LogInfo(GetType().Name, "samples/" + sample_name);
                 pads[padIndex].SetAudio("samples/" + sample_name);
                 pads[padIndex].LocallyPlayAudio();
             }
-
-            
         }
+
+        // END TEAM JAIME
 
         private void UpdateConnectionState(ConnectionState state)
         {
