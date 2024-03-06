@@ -16,13 +16,11 @@ using UnityEngine.Events;
 
 public class MadPads_Pad : NetworkBehaviour
 {
-    
+
     public UnityEvent onTouch;
     public UnityEvent onLeave;
     private Color _initialColor;
     public string padName;
-
-
 
     // Distribute the triangle color, too, to show the color of the pad.
     public NetworkVariable<Color> color = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -30,8 +28,7 @@ public class MadPads_Pad : NetworkBehaviour
     // This bool needs to be shared so all clients know if the a pad is being touched.
     private readonly NetworkVariable<bool> playing = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    // A networked variable to keep track of who touches a pad.
-    //changed it to ulong to have the client id serialized not the gameobject 
+    // A networked user ID to keep track of who touches a pad.
     private readonly NetworkVariable<ulong> touchingPlayer = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     NetworkedAudioPlayer audioPlayer;
@@ -39,11 +36,29 @@ public class MadPads_Pad : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        padName = gameObject.transform.parent != null ? gameObject.transform.parent.gameObject.name : "No Name";
-        //uglyyy i know
-        padName += gameObject.transform.parent.transform.parent != null ? gameObject.transform.parent.transform.parent.transform.parent.gameObject.name : "No Name";
-        Debug.Log("Pad " + padName + " checking in!");
+        // Try to give the pad a name.
+        if (gameObject.transform.parent != null)
+        {
+            padName = gameObject.transform
+                .parent.gameObject.name;
+        } 
 
+        // Try to add another part to the end of its name?
+        if (gameObject.transform.parent.transform.parent != null)
+        {
+            padName += gameObject.transform
+                .parent.transform
+                .parent.transform
+                .parent.gameObject.name;
+        }
+
+        // If it doesn't have a name by now, give it a default name.
+        if (padName == null)
+        {
+            padName = "No Name";
+        }
+
+        Debug.Log("Pad " + padName + " checking in!");
 
         // Locally keep track of the initial color. No need to distribute.
         _initialColor = InteractiveMaterial.GetColor("_Color");
@@ -79,7 +94,7 @@ public class MadPads_Pad : NetworkBehaviour
 
     }
     //function calling a networkedaudioplayer method
-    public void Play(double duration = 0 , ulong playingID = 1000)
+    public void Play(double duration = 0, ulong playingID = 1000)
     {
         audioPlayer.PlayAudio(duration);
         Debug.Log(duration.ToString() + padName);
