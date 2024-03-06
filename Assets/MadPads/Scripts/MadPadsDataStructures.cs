@@ -1,0 +1,21 @@
+public enum MadPadId
+{
+    LeftPads_TopLeft,
+    LeftPads_CenterLeft,
+    LeftPads_BottomLeft,
+    LeftPads_TopCenter,
+    LeftPads_CenterCenter,
+    LeftPads_BottomCenter,
+    LeftPads_TopRight,
+    LeftPads_CenterRight,
+    LeftPads_BottomRight,
+    RightPads_TopLeft,
+    RightPads_CenterLeft,
+    RightPads_BottomLeft,
+    RightPads_TopCenter,
+    RightPads_CenterCenter,
+    RightPads_BottomCenter,
+    RightPads_TopRight,
+    RightPads_CenterRight,
+    RightPads_BottomRight
+}
