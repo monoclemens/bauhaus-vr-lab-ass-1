@@ -367,25 +367,28 @@ namespace VRSYS.Core.Networking
                 throw;
             }
         }
-        //a timer for the initial sequence to play
+
+        /***Team Jaime***
+         * 
+         * A timer for the initial sequence to play.
+         */
         private IEnumerator LogElapsedTimeCoroutine()
         {
             int timeLeft;
-            //for now it is playing from the interactable cube
-            NetworkedAudioPlayer initialAudioPlayer = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
+
+            // For now it is playing from the interactable cube. TODO: Use this variable.
+            NetworkedAudioPlayer initialAudioPlayer = GameObject
+                .Find("InteractableCube")
+                .GetComponent<NetworkedAudioPlayer>();
+
             while (lobbyTimer.Elapsed.TotalSeconds < timerLength)
             {
                 yield return new WaitForSeconds(1); // Wait for 1 second
                 timeLeft = timerLength - (int)lobbyTimer.Elapsed.TotalSeconds;
 
                 ExtendedLogger.LogInfo(GetType().Name, "First sequence will be played in: " + timeLeft.ToString());
-
-                    
             }
-
-            
         }
-
  
         private IEnumerator HeartbeatLobbyCoroutine(string lobbyName, float waitTimeSeconds)
         {
@@ -462,10 +465,20 @@ namespace VRSYS.Core.Networking
 
                 if (verbose)
                 {
-                    //will need to add a server RPC here to update pad info
-                    //the server needs to send each client what their audioPath needs to be
-                    //which will then be set as audioSource.clip
-                    string audioPath = GameObject.Find("MadPads").transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<NetworkedAudioPlayer>().audioPath.Value.ToString();
+                    /***Property of team Jaime***
+                     * 
+                     * TODO: Will need to add a server RPC here to update pad info.
+                     *       The server needs to send each client what their audioPath needs to be.
+                     *       Which will then be set as audioSource.clip.
+                     */                    
+                    string audioPath = GameObject.Find("MadPads").transform
+                        .GetChild(0)
+                        .GetChild(0)
+                        .GetChild(0)
+                        .GetChild(0).gameObject
+                        .GetComponent<NetworkedAudioPlayer>()
+                        .audioPath.Value.ToString();
+
                     ExtendedLogger.LogInfo(GetType().Name, "joined lobby: " + lobby.Id);
                     ExtendedLogger.LogInfo(GetType().Name, "sample " + audioPath);
                     ExtendedLogger.LogInfo(GetType().Name, "lobby players: " + lobby.Players.Capacity);
