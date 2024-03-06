@@ -125,17 +125,17 @@ public class GameManager : NetworkBehaviour
     private void SequencePlayer(Stack<Tuple<string, double>> sequence)
     {
         double prevDuration = 0.0;
-        string sampleName = "";
+        string padName = "";
         double sampleDuration = 0;
         while (sequence.Count > 0)
         {
             Tuple<string, double> sample = sequence.Pop();
 
-            sampleName = sample.Item1;
+            padName = sample.Item1;
             sampleDuration = sample.Item2;
 
             
-            StartCoroutine(PlaySampleCoroutine(sampleName, sampleDuration, prevDuration));
+            StartCoroutine(PlaySampleCoroutine(padName, sampleDuration, prevDuration));
             //!!!IMPORTANT!!!
             //this is not only the previous sample's playing duration but all
             //the time starting from the first iteration in this while loop
@@ -147,17 +147,17 @@ public class GameManager : NetworkBehaviour
     }
 
     //Needed a coroutine because playing of samples need to wait for the previous one to finish
-    private IEnumerator PlaySampleCoroutine(string sampleName, double sampleDuration, double prevDuration)
+    private IEnumerator PlaySampleCoroutine(string padName, double sampleDuration, double prevDuration)
     {
         // Check if the key exists in the padMap
-        if (padMap.ContainsKey(sampleName))
+        if (padMap.ContainsKey(padName))
         {
             yield return new WaitForSeconds((float)prevDuration);
-            padMap[sampleName].Play(sampleDuration);
+            padMap[padName].Play(sampleDuration);
         }
         else
         {
-            Debug.LogError($"Sample with name '{sampleName}' not found in the padMap.");
+            Debug.LogError($"Sample with name '{padName}' not found in the padMap.");
         }
     }
     //Random sequence that adds up to sequenceLength is generated 
@@ -168,6 +168,8 @@ public class GameManager : NetworkBehaviour
 
         List<string> padKeys = new List<string>(padMap.Keys);
 
+        //double precision causes problems here because sometimes there is 0.399999 time left for instance
+        //TO:DO add epsilon tolerance
         while (remainingSum >= 0.4)
         {
             int randomSampleIndex = Random.Range(0, padMap.Count);
