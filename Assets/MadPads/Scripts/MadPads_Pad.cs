@@ -85,18 +85,17 @@ public class MadPads_Pad : NetworkBehaviour
         color.OnValueChanged += OnColorChanged;
 
         audioPlayer = GetComponent<NetworkedAudioPlayer>();
-
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-    //function calling a networkedaudioplayer method
+    /**
+     * Function calling a networkedaudioplayer method.
+     * 
+     * TODO: Figure out if the playingID is necessary.
+     */
     public void Play(double duration = 0, ulong playingID = 1000)
     {
         audioPlayer.PlayAudio(duration);
+
         Debug.Log(duration.ToString() + padName);
     }
 
@@ -107,22 +106,31 @@ public class MadPads_Pad : NetworkBehaviour
             "_EmissionColor",
             current);
     }
-    // This can be done locally, because the interaction color is always the same.
+
+    /**
+     * This can be done locally, because the interaction color is always the same.
+     * 
+     * TODO: Make use of this when interacting.
+     */
     private void TogglePadColor()
     {
         InteractiveMaterial.color = InteractiveMaterial.color == _initialColor
             ? Color.blue
             : _initialColor;
     }
+
     #region RPCs
 
-    //server checks if sync needed and forwards the updated path to clients
+    // Server checks if syncing is needed and forwards the updated path to clients.
     public void Sync()
     {
         audioPlayer.SyncServerRpc();
     }
+
     #endregion
+
     #region Rendering
+
     // A singleton for the renderer with a corresponding getter.
     private Renderer _renderer;
     public Renderer Renderer
@@ -175,5 +183,6 @@ public class MadPads_Pad : NetworkBehaviour
             return _triangleMaterial;
         }
     }
+
     #endregion
 }
