@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -26,7 +27,7 @@ public class MadPads_Pad : NetworkBehaviour
     public NetworkVariable<Color> color = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     // This bool needs to be shared so all clients know if the a pad is being touched.
-    private readonly NetworkVariable<bool> playing = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private readonly NetworkVariable<bool> isPlaying = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     // A networked user ID to keep track of who touches a pad.
     private readonly NetworkVariable<ulong> touchingPlayer = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -60,9 +61,6 @@ public class MadPads_Pad : NetworkBehaviour
 
         Debug.Log("Pad " + padName + " checking in!");
 
-        // Locally keep track of the initial color. No need to distribute.
-        _initialColor = InteractiveMaterial.GetColor("_Color");
-
         // The following code just demonstrates how to change the color of materials, @Cem.
         Color testColor = new(
             Random.Range(0f, 1f),
@@ -78,11 +76,14 @@ public class MadPads_Pad : NetworkBehaviour
             "_EmissionColor",
             testColor);
 
+        // Locally keep track of the initial color. No need to distribute.
+        _initialColor = testColor;
+
         /**
          * Attach a listener to the color network variable.
          * TODO: We might need to "subtract" it on destroy. Check!
          */
-        color.OnValueChanged += OnColorChanged;
+        // color.OnValueChanged += OnColorChanged;
 
         audioPlayer = GetComponent<NetworkedAudioPlayer>();
     }
@@ -95,6 +96,12 @@ public class MadPads_Pad : NetworkBehaviour
     public void Play(double duration = 0, ulong playingID = 1000)
     {
         audioPlayer.PlayAudio(duration);
+
+        var checkedDuration = duration == 0
+            ? audioPlayer.clipLength
+            : duration;
+
+        ChangeInteractionColorServerRpc(checkedDuration);
 
         Debug.Log(duration.ToString() + padName);
     }
@@ -114,12 +121,32 @@ public class MadPads_Pad : NetworkBehaviour
      */
     private void TogglePadColor()
     {
-        InteractiveMaterial.color = InteractiveMaterial.color == _initialColor
-            ? Color.blue
-            : _initialColor;
+        Debug.Log($"Called TogglePadColor. Current color: {InteractiveMaterial.color}. Initial color: {_initialColor}");
+
+        InteractiveMaterial.SetColor(
+            "_Color",
+            InteractiveMaterial.color == _initialColor
+                ? Color.blue
+                : _initialColor);
     }
 
     #region RPCs
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ChangeInteractionColorServerRpc(double duration)
+    {
+        ChangeInteractionColorClientRpc(duration);
+    }
+
+    [ClientRpc]
+    public void ChangeInteractionColorClientRpc(double duration)
+    {
+        Debug.Log("Called ChangeInteractionColorClientRpc with duration " + duration);
+
+        TogglePadColor();
+
+        StartCoroutine(ChangeInteractionColorCoroutine(duration));
+    }
 
     // Server checks if syncing is needed and forwards the updated path to clients.
     public void Sync()
@@ -182,6 +209,18 @@ public class MadPads_Pad : NetworkBehaviour
 
             return _triangleMaterial;
         }
+    }
+
+    #endregion
+
+    #region coroutines
+    private IEnumerator ChangeInteractionColorCoroutine(double duration)
+    {
+        yield return new WaitForSeconds((float)duration);
+
+        Debug.Log("Waited, resuming execution.");
+
+        TogglePadColor();        
     }
 
     #endregion

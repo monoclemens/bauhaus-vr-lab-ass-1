@@ -21,7 +21,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
 
     public bool syncNeeded = false;
     private AudioSource audioSource;
-    private float clipLength;
+    public float clipLength;
 
     // For those pads whose samples were changed before the start of the server.
     private FixedString32Bytes uiAudioPath;
