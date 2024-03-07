@@ -20,11 +20,9 @@ public class MadPads_Pad : NetworkBehaviour
 
     public UnityEvent onTouch;
     public UnityEvent onLeave;
-    private Color _initialColor;
     public string padName;
 
-    // Distribute the triangle color, too, to show the color of the pad.
-    public NetworkVariable<Color> color = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public Color color;
 
     private bool isPlaying = false;
 
@@ -65,31 +63,25 @@ public class MadPads_Pad : NetworkBehaviour
 
         Debug.Log("Pad " + padName + " checking in!");
 
-        // The following code just demonstrates how to change the color of materials, @Cem.
-        Color testColor = new(
-            Random.Range(0f, 1f),
-            Random.Range(0f, 1f),
-            Random.Range(0f, 1f),
-            Random.Range(0f, 1f));
-
-        InteractiveMaterial.SetColor(
-            "_Color",
-            testColor);
-
-        TriangleMaterial.SetColor(
-            "_EmissionColor",
-            testColor);
-
-        // Locally keep track of the initial color. No need to distribute.
-        _initialColor = testColor;
-
         /**
          * Attach a listener to the color network variable.
          * TODO: We might need to "subtract" it on destroy. Check!
          */
-        // color.OnValueChanged += OnColorChanged;
 
         audioPlayer = GetComponent<NetworkedAudioPlayer>();
+    }
+
+    public void SyncColor(Color newColor)
+    {
+        color = newColor;
+
+        InteractiveMaterial.SetColor(
+            "_Color",
+            color);
+
+        TriangleMaterial.SetColor(
+            "_EmissionColor",
+            color);
     }
 
     /**
@@ -114,14 +106,6 @@ public class MadPads_Pad : NetworkBehaviour
         ResetInteractivityServerRpc(checkedDuration);
     }
 
-    // The listener changing the triangle color.
-    public void OnColorChanged(Color previous, Color current)
-    {
-        TriangleMaterial.SetColor(
-            "_EmissionColor",
-            current);
-    }
-
     /**
      * This can be done locally, because the interaction color is always the same.
      * 
@@ -129,13 +113,11 @@ public class MadPads_Pad : NetworkBehaviour
      */
     private void TogglePadColor()
     {
-        Debug.Log($"Called TogglePadColor. Current color: {InteractiveMaterial.color}. Initial color: {_initialColor}");
-
         InteractiveMaterial.SetColor(
             "_Color",
-            InteractiveMaterial.color == _initialColor
+            InteractiveMaterial.color == color
                 ? Color.blue
-                : _initialColor);
+                : color);
     }
 
     #region RPCs

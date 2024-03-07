@@ -13,6 +13,9 @@ public class GameManager : NetworkBehaviour
      */
     private Dictionary<string, MadPads_Pad> padMap = new Dictionary<string, MadPads_Pad>();
 
+    // A map for keeping track of the color.
+    private Dictionary<string, Color> padColorMap = new();
+
     /** 
      * Initially set to Misty Mountains. 
      * Might make sense to turn it into a queue instead because in the current setup 
@@ -107,6 +110,8 @@ public class GameManager : NetworkBehaviour
         if (startButton.name == collidedObject.name && isPlayingSequence == false)
         {
             isPlayingSequence = true;
+
+            RandomlyChoosePadColorServerRpc();
 
             if (!firstStart)
             {
@@ -224,6 +229,39 @@ public class GameManager : NetworkBehaviour
         }
 
         return randomSequence;
+    }
+
+    #endregion
+
+    #region rpcs
+
+    /**
+     * This RPC will create random colors for each pad and then tell every client to set that color.
+     * This way the colors will be random but equal on all clients.
+     */ 
+    [ServerRpc(RequireOwnership = false)]
+    public void RandomlyChoosePadColorServerRpc()
+    {
+        foreach (var keyValuePair in padMap)
+        {
+            Color randomColor = new(
+                Random.Range(0f, 1f),
+                Random.Range(0f, 1f),
+                Random.Range(0f, 1f),
+                Random.Range(0f, 1f));
+
+            SetRandomlyChoosenPadColorClientRpc(keyValuePair.Key, randomColor);
+        }
+    }
+
+    [ClientRpc]
+    public void SetRandomlyChoosenPadColorClientRpc(string key, Color color)
+    {
+        padColorMap[key] = color;
+
+        var pad = padMap[key];
+
+        pad.SyncColor(color);
     }
 
     #endregion
