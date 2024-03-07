@@ -75,7 +75,7 @@ public class MadPads_Pad : NetworkBehaviour
      * 
      * TODO: Figure out if the playingID is necessary.
      */
-    public void Play(double duration = 0, ulong playingID = 1000)
+    public void Play(double duration = 0, bool isDemo = false)
     {
         if (isPlaying) return;
 
@@ -84,7 +84,7 @@ public class MadPads_Pad : NetworkBehaviour
         audioPlayer.PlayAudio(duration);
 
         // Trigger the validation from here because we don't want to trigger it for every collision between hand and pad.
-        gameManager.ValidatePlayedSoundServerRpc(padName);
+        if (!isDemo) gameManager.ValidatePlayedSoundServerRpc(padName);
 
         var checkedDuration = duration == 0
             ? audioPlayer.clipLength

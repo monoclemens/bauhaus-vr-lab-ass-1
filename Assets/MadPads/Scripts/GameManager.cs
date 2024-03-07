@@ -282,7 +282,7 @@ public class GameManager : NetworkBehaviour
         {
             yield return new WaitForSeconds((float)prevDuration);
 
-            padMap[padName].Play(sampleDuration);
+            padMap[padName].Play(sampleDuration, true);
         }
         else
         {
