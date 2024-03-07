@@ -26,13 +26,17 @@ public class MadPads_Pad : NetworkBehaviour
     // Distribute the triangle color, too, to show the color of the pad.
     public NetworkVariable<Color> color = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    // This bool needs to be shared so all clients know if the a pad is being touched.
-    private readonly NetworkVariable<bool> isPlaying = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private bool isPlaying = false;
 
     // A networked user ID to keep track of who touches a pad.
     private readonly NetworkVariable<ulong> touchingPlayer = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     NetworkedAudioPlayer audioPlayer;
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log($"Collision detected!\nPad: {gameObject.name}\nCollider: {collision.gameObject.name}");
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -95,6 +99,10 @@ public class MadPads_Pad : NetworkBehaviour
      */
     public void Play(double duration = 0, ulong playingID = 1000)
     {
+        if (isPlaying) return;
+
+        isPlaying = true;
+
         audioPlayer.PlayAudio(duration);
 
         var checkedDuration = duration == 0
@@ -103,7 +111,7 @@ public class MadPads_Pad : NetworkBehaviour
 
         ChangeInteractionColorServerRpc(checkedDuration);
 
-        Debug.Log(duration.ToString() + padName);
+        ResetInteractivityServerRpc(checkedDuration);
     }
 
     // The listener changing the triangle color.
@@ -133,6 +141,12 @@ public class MadPads_Pad : NetworkBehaviour
     #region RPCs
 
     [ServerRpc(RequireOwnership = false)]
+    public void ResetInteractivityServerRpc(double duration)
+    {
+        ResetInteractivityClientRpc(duration);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
     public void ChangeInteractionColorServerRpc(double duration)
     {
         ChangeInteractionColorClientRpc(duration);
@@ -141,11 +155,15 @@ public class MadPads_Pad : NetworkBehaviour
     [ClientRpc]
     public void ChangeInteractionColorClientRpc(double duration)
     {
-        Debug.Log("Called ChangeInteractionColorClientRpc with duration " + duration);
-
         TogglePadColor();
 
         StartCoroutine(ChangeInteractionColorCoroutine(duration));
+    }
+
+    [ClientRpc]
+    public void ResetInteractivityClientRpc(double duration)
+    {
+        StartCoroutine(ResetInteractivityCoroutine(duration));
     }
 
     // Server checks if syncing is needed and forwards the updated path to clients.
@@ -218,9 +236,14 @@ public class MadPads_Pad : NetworkBehaviour
     {
         yield return new WaitForSeconds((float)duration);
 
-        Debug.Log("Waited, resuming execution.");
-
         TogglePadColor();        
+    }
+
+    private IEnumerator ResetInteractivityCoroutine(double duration)
+    {
+        yield return new WaitForSeconds((float)duration);
+
+        isPlaying = false;
     }
 
     #endregion

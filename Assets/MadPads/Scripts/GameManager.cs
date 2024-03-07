@@ -29,6 +29,7 @@ public class GameManager : NetworkBehaviour
     private NetworkedAudioPlayer startButton;
 
     private bool firstStart = false;
+    private bool isPlayingSequence = false;
 
     void Start()
     {
@@ -103,9 +104,11 @@ public class GameManager : NetworkBehaviour
      */
     private void HandleCollision(GameObject collidedObject)
     {
-        if(startButton.name == collidedObject.name)
+        if (startButton.name == collidedObject.name && isPlayingSequence == false)
         {
-            if(!firstStart)
+            isPlayingSequence = true;
+
+            if (!firstStart)
             {
                 firstStart = true;
 
@@ -124,7 +127,10 @@ public class GameManager : NetworkBehaviour
             }
 
             SequencePlayer(sequence);
+
+            StartCoroutine(ResetCubeInteractivity());
         }
+
         if (collidedObject.GetComponent<MadPads_Pad>() != null)
         {
             MadPads_Pad playedPad = collidedObject.GetComponent<MadPads_Pad>();
@@ -158,6 +164,16 @@ public class GameManager : NetworkBehaviour
              */
             prevDuration += sampleDuration;
         }
+    }
+
+    /**
+     * This Coroutine only makes the cube interactable again after playing the sequence.
+     */
+    private IEnumerator ResetCubeInteractivity ()
+    {
+        yield return new WaitForSeconds((float)sequenceLength);
+
+        isPlayingSequence = false;
     }
 
     // A coroutine because playing the samples needs to wait for the previous one to finish.

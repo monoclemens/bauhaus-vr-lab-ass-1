@@ -83,16 +83,19 @@ public class VirtualHand : MonoBehaviour
     #endregion
 
     #region Grab Methods
-    //TO:DO we need to implement the actual hitting for now it is only like grab without grabbing
+
+    /***TEAM JAIME***
+     * 
+     * This method handles "hitting" the pads without grabbing them.
+     */
     private void Hitting()
     {
-        if (grabAction.action.WasPressedThisFrame() && handCollider.isColliding)
-        {
-            hitObject = handCollider.collidingObject;
-            OnCollision?.Invoke(hitObject);
+        // Early return if there is no collision.
+        if (!handCollider.isColliding) return;
 
-        }
-        
+        hitObject = handCollider.collidingObject;
+
+        OnCollision?.Invoke(hitObject);
     }
 
     private void ReparentingGrab()
