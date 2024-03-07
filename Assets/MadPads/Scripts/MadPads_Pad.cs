@@ -17,25 +17,15 @@ using UnityEngine.Events;
 
 public class MadPads_Pad : NetworkBehaviour
 {
-
     public UnityEvent onTouch;
     public UnityEvent onLeave;
     public string padName;
 
     public Color color;
-
     private bool isPlaying = false;
-
-    // A networked user ID to keep track of who touches a pad.
-    private readonly NetworkVariable<ulong> touchingPlayer = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     NetworkedAudioPlayer audioPlayer;
     public GameManager gameManager;
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log($"Collision detected!\nPad: {gameObject.name}\nCollider: {collision.gameObject.name}");
-    }
 
     // Start is called before the first frame update
     void Start()
