@@ -43,6 +43,10 @@ public class GameManager : NetworkBehaviour
     bool isTimeoutRunning = false;
     List<string> correctSequence;
 
+    GameObject progressBar;
+    public GameObject progressBarStepper;
+    Dictionary<string, GameObject> progressBarSteppers = new();
+
     // The sequence that is currently being tracked in time.
     readonly List<string> currentlyTrackedSequence = new();
 
@@ -54,6 +58,11 @@ public class GameManager : NetworkBehaviour
     void Start()
     {
         GetPads();
+
+        // Get a reference to the progress bar.
+        progressBar = GameObject.Find("ProgressBar");
+
+        Debug.Assert(progressBar != null, "Could not find the ProgressBar in the scene!");
 
         /**
          * Used to detect if the button is pressed.
@@ -116,10 +125,12 @@ public class GameManager : NetworkBehaviour
         correctSequence = GetListFromSequenceStack(sequence);
     }
 
+    #endregion
+
     /**
      * Just a little helper to transform the stack of (padID | duration) tuples into a list of padIDs.
      */
-    private List<string> GetListFromSequenceStack(Stack<Tuple<string, double>> sequenceStack) 
+    private List<string> GetListFromSequenceStack(Stack<Tuple<string, double>> sequenceStack)
     {
         List<string> sequenceList = new();
 
@@ -131,7 +142,29 @@ public class GameManager : NetworkBehaviour
         return sequenceList;
     }
 
-    #endregion
+    private void PlaceStepperOnBar(string padID, double offsetPercentage)
+    {
+        if (!progressBar) return;
+
+        // Create a new stepper.
+        var stepper = Instantiate(progressBarStepper);
+
+        // Make it a child of the bar.
+        stepper.transform.parent = progressBar.transform;
+
+        var relativePositionOnBar = progressBar.transform.localScale.y * (float)offsetPercentage;
+        var barRootOffset = progressBar.transform.localScale.y / 2;
+
+        // Place it in the root of its parent, the bar, and apply the Y-offset relative to the bar's length.
+        // Apply a negative offset, too, so the steppers don't start in the middle of the bar but in the left end of it.
+        stepper.transform.localPosition = new(
+            0, 
+            relativePositionOnBar - barRootOffset, 
+            0);
+
+        // Save a reference to the stepper behind the pad's ID in a dict.
+        progressBarSteppers[padID] = stepper;
+    }
 
     /**
      * All collisions land in this method, including pads and button(s).
@@ -212,6 +245,8 @@ public class GameManager : NetworkBehaviour
              * Because a coroutine runs every frame.
              */
             prevDuration += sampleDuration;
+
+            PlaceStepperOnBar(padName, prevDuration / sequenceLength);
         }
     }
 
