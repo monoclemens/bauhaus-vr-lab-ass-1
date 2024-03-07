@@ -34,6 +34,23 @@ public class GameManager : NetworkBehaviour
     private bool firstStart = false;
     private bool isPlayingSequence = false;
 
+
+    #region validation variables
+
+    // The seconds determining how long they have to play the next correct pad.
+    readonly float secondsToWait = 3f;
+    Coroutine timeoutCoroutine;
+    bool isTimeoutRunning = false;
+    List<string> correctSequence;
+
+    // The sequence that is currently being tracked in time.
+    readonly List<string> currentlyTrackedSequence = new();
+
+    // The current progress of the players. With this we can visualize the "progress bar".
+    readonly List<string> correctlyPlayedSequence = new();
+
+    #endregion
+
     void Start()
     {
         GetPads();
@@ -70,6 +87,9 @@ public class GameManager : NetworkBehaviour
                 if (pad != null)
                 {
                     padMap.Add(pad.padName, pad);
+
+                    // Attach this object to the pad.
+                    pad.gameManager = this;
                 }
                 else
                 {
@@ -92,6 +112,23 @@ public class GameManager : NetworkBehaviour
         sequence.Push(new Tuple<string, double>("Pad_TopLeftRightPads", 1.6));
         sequence.Push(new Tuple<string, double>("Pad_CenterCenterLeftPads", 0.8));
         sequence.Push(new Tuple<string, double>("Pad_TopLeftLeftPads", 0.8));
+
+        correctSequence = GetListFromSequenceStack(sequence);
+    }
+
+    /**
+     * Just a little helper to transform the stack of (padID | duration) tuples into a list of padIDs.
+     */
+    private List<string> GetListFromSequenceStack(Stack<Tuple<string, double>> sequenceStack) 
+    {
+        List<string> sequenceList = new();
+
+        foreach (var pair in sequenceStack)
+        {
+            sequenceList.Add(pair.Item1);
+        }
+
+        return sequenceList;
     }
 
     #endregion
@@ -129,6 +166,13 @@ public class GameManager : NetworkBehaviour
             else
             {
                 sequence = RandomSequenceGenerator();
+
+                // Keep track of the correct sequence, no matter what happens to the stack.
+                correctSequence = GetListFromSequenceStack(sequence);
+
+                // Reset the players' progress.
+                currentlyTrackedSequence.Clear();
+                correctlyPlayedSequence.Clear();
             }
 
             SequencePlayer(sequence);
@@ -265,4 +309,80 @@ public class GameManager : NetworkBehaviour
     }
 
     #endregion
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ValidatePlayedSoundServerRpc(string padID)
+    {
+        ValidatePlayedSoundClientRpc(padID);
+    }
+
+    [ClientRpc]
+    public void ValidatePlayedSoundClientRpc(string padID)
+    {
+        Debug.Log($"Sound played by pad {padID}");
+
+        Debug.Assert(correctSequence != null, "There is no defined sequence yet!");
+
+        // Early return if there is no sequence.
+        if (correctSequence == null) return;
+
+        // Check if the played pad is the next correct one.
+        if (padID == correctSequence[currentlyTrackedSequence.Count])
+        {
+            Debug.Log("A correct pad was played!");
+
+            if (isTimeoutRunning)
+            {
+                // Stop the countdown first.
+                StopCoroutine(timeoutCoroutine);
+
+                isTimeoutRunning = false;
+            }
+
+            // Add the pad's ID to their progress ...
+            correctlyPlayedSequence.Add(padID);
+
+            // ... and to the tracked IDs.
+            currentlyTrackedSequence.Add(padID);
+
+            // If the correctly played IDs are as long as the original sequence, they won.
+            if (correctlyPlayedSequence.Count == correctSequence.Count)
+            {
+                Debug.Log("The players won!");
+
+                // Now just tidy up.
+                correctlyPlayedSequence.Clear();
+                currentlyTrackedSequence.Clear();
+            }
+            else
+            {
+                // Start it again if there is work left to do.
+                timeoutCoroutine = StartCoroutine(TimeoutCoroutine());
+            }
+        }
+        else
+        {
+            Debug.LogWarning("A wrong pad was played.");
+
+            // If the players make a mistake, clear the tracked sequence.
+            currentlyTrackedSequence.Clear();
+        }
+    }
+
+    IEnumerator TimeoutCoroutine()
+    {
+        Debug.Log("Timeout started.");
+
+        isTimeoutRunning = true;
+
+        // Wait for a certain amount of time.
+        yield return new WaitForSeconds(secondsToWait);
+
+        Debug.Log("Timeout ran through.");
+
+        isTimeoutRunning = false;
+
+        // If the timeout has not been stopped, clear the tracked sequence.
+        currentlyTrackedSequence.Clear();
+    }
 }

@@ -30,6 +30,7 @@ public class MadPads_Pad : NetworkBehaviour
     private readonly NetworkVariable<ulong> touchingPlayer = new(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     NetworkedAudioPlayer audioPlayer;
+    public GameManager gameManager;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -63,11 +64,6 @@ public class MadPads_Pad : NetworkBehaviour
 
         Debug.Log("Pad " + padName + " checking in!");
 
-        /**
-         * Attach a listener to the color network variable.
-         * TODO: We might need to "subtract" it on destroy. Check!
-         */
-
         audioPlayer = GetComponent<NetworkedAudioPlayer>();
     }
 
@@ -96,6 +92,9 @@ public class MadPads_Pad : NetworkBehaviour
         isPlaying = true;
 
         audioPlayer.PlayAudio(duration);
+
+        // Trigger the validation from here because we don't want to trigger it for every collision between hand and pad.
+        gameManager.ValidatePlayedSoundServerRpc(padName);
 
         var checkedDuration = duration == 0
             ? audioPlayer.clipLength
