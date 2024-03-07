@@ -45,7 +45,9 @@ public class GameManager : NetworkBehaviour
 
     GameObject progressBar;
     public GameObject progressBarStepper;
-    Dictionary<string, GameObject> progressBarSteppers = new();
+
+    // A list of tuples to save the pad IDs, their steppers and their order.
+    List<Tuple<string, GameObject>> progressBarSteppers = new();
 
     // The sequence that is currently being tracked in time.
     readonly List<string> currentlyTrackedSequence = new();
@@ -162,8 +164,8 @@ public class GameManager : NetworkBehaviour
             relativePositionOnBar - barRootOffset, 
             0);
 
-        // Save a reference to the stepper behind the pad's ID in a dict.
-        progressBarSteppers[padID] = stepper;
+        var padStepperTuple = new Tuple<string, GameObject>(padID, stepper);
+        progressBarSteppers.Add(padStepperTuple);
     }
 
     /**
@@ -206,6 +208,8 @@ public class GameManager : NetworkBehaviour
                 // Reset the players' progress.
                 currentlyTrackedSequence.Clear();
                 correctlyPlayedSequence.Clear();
+
+                ResetSteppers();
             }
 
             SequencePlayer(sequence);
@@ -221,6 +225,16 @@ public class GameManager : NetworkBehaviour
     }
 
     #region StartButtonFunctions
+
+    void ResetSteppers()
+    {
+        foreach (var stepper in progressBarSteppers)
+        {
+            Destroy(stepper.Item2);
+        }
+
+        progressBarSteppers.Clear();
+    }
 
     /**
      * Plays the given sequence popping all samples needing playing from the stack.
@@ -361,10 +375,32 @@ public class GameManager : NetworkBehaviour
         // Early return if there is no sequence.
         if (correctSequence == null) return;
 
+        var currentIndex = currentlyTrackedSequence.Count;
+
         // Check if the played pad is the next correct one.
-        if (padID == correctSequence[currentlyTrackedSequence.Count])
+        if (padID == correctSequence[currentIndex])
         {
             Debug.Log("A correct pad was played!");
+
+            var stepperTuple = progressBarSteppers[currentIndex];
+
+            // Get the pad's color.
+            var padColor = padColorMap[stepperTuple.Item1];
+
+            // Get a reference to the stepper.
+            var stepper = stepperTuple.Item2;
+
+            // Get the Renderer component attached to the stepper.
+            Renderer renderer = stepper.GetComponent<Renderer>();
+
+            // Create a new material to prevent changing the color of all spheres sharing the same material.
+            Material newMaterial = new(renderer.material)
+            {
+                color = padColor
+            };
+
+            // Assign the new material to the sphere.
+            renderer.material = newMaterial;
 
             if (isTimeoutRunning)
             {
