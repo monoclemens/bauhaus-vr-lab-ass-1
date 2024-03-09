@@ -45,6 +45,8 @@ using UnityEngine.Events;
 using VRSYS.Core.Avatar;
 using VRSYS.Core.Logging;
 using VRSYS.Core.ScriptableObjects;
+using UnityEditor;
+
 
 namespace VRSYS.Core.Networking
 {
@@ -83,7 +85,11 @@ namespace VRSYS.Core.Networking
         private bool isDisconnecting = false;
 
         private NetworkUserSpawnInfo spawnInfo;
-        
+
+
+        private string trackerPath = "Assets/MadPads/Prefabs/MadPads_ProgressBar.prefab";
+        private GameObject trackerPrefab;
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -118,6 +124,27 @@ namespace VRSYS.Core.Networking
                 userRole.Value = spawnInfo.userRole;
 
                 onLocalUserSetup.Invoke();
+
+                trackerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(trackerPath);
+
+                if (trackerPrefab != null)
+                {
+                    // Instantiate the object
+                    GameObject instantiatedObject = Instantiate(trackerPrefab);
+
+                    // Set the initial position
+                    instantiatedObject.transform.position = new Vector3(0f,0.05f, 0.4f);
+
+                    // Set the initial object name
+                    instantiatedObject.name = "ProgressBar";
+
+                    // Attach the object to the head
+                    instantiatedObject.transform.SetParent(avatarAnatomy.head, false);
+                }
+                else
+                {
+                    Debug.LogError("Prefab not found at the specified path: " + trackerPath);
+                }
             }
             else
             {

@@ -61,11 +61,6 @@ public class GameManager : NetworkBehaviour
     {
         GetPads();
 
-        // Get a reference to the progress bar.
-        progressBar = GameObject.Find("ProgressBar");
-
-        Debug.Assert(progressBar != null, "Could not find the ProgressBar in the scene!");
-
         /**
          * Used to detect if the button is pressed.
          * Will need to change its name to, for example, StartButton.
@@ -76,6 +71,15 @@ public class GameManager : NetworkBehaviour
 
         // This is an event handler that catches collision detected in VirtualHand
         VirtualHand.OnCollision += HandleCollision;
+    }
+
+    private void Update()
+    {
+        if(progressBar == null)
+        {
+            // Get a reference to the progress bar.
+            progressBar = GameObject.Find("ProgressBar");
+        }
     }
 
     #region OneTimeFunctions
@@ -154,14 +158,17 @@ public class GameManager : NetworkBehaviour
         // Make it a child of the bar.
         stepper.transform.parent = progressBar.transform;
 
-        var relativePositionOnBar = progressBar.transform.localScale.y * (float)offsetPercentage;
-        var barRootOffset = progressBar.transform.localScale.y / 2;
+        // Make it a child of the bar.
+        stepper.transform.localRotation = Quaternion.Euler(new Vector3(0f,0f,90f));
+
+        var relativePositionOnBar = 2 * (float)offsetPercentage;
+        //var barRootOffset = progressBar.transform.localScale.y / 2;
 
         // Place it in the root of its parent, the bar, and apply the Y-offset relative to the bar's length.
         // Apply a negative offset, too, so the steppers don't start in the middle of the bar but in the left end of it.
         stepper.transform.localPosition = new(
             0, 
-            relativePositionOnBar - barRootOffset, 
+            -1 + relativePositionOnBar, 
             0);
 
         var padStepperTuple = new Tuple<string, GameObject>(padID, stepper);
@@ -252,6 +259,8 @@ public class GameManager : NetworkBehaviour
             
             StartCoroutine(PlaySampleCoroutine(padName, sampleDuration, prevDuration));
 
+            PlaceStepperOnBar(padName, prevDuration / sequenceLength);
+
             /**
              * !!!IMPORTANT!!!
              * This is not only the previous sample's playing duration but all
@@ -260,7 +269,7 @@ public class GameManager : NetworkBehaviour
              */
             prevDuration += sampleDuration;
 
-            PlaceStepperOnBar(padName, prevDuration / sequenceLength);
+        
         }
     }
 
