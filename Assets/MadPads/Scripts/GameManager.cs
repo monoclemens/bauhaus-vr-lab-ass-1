@@ -31,7 +31,6 @@ public class GameManager : NetworkBehaviour
 
     private NetworkedAudioPlayer startButton;
 
-    private bool firstStart = false;
     private bool isPlayingSequence = false;
 
 
@@ -55,6 +54,11 @@ public class GameManager : NetworkBehaviour
     // The current progress of the players. With this we can visualize the "progress bar".
     readonly List<string> correctlyPlayedSequence = new();
 
+    private NetworkVariable<int> startPressed = new(0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
     #endregion
 
     void Start()
@@ -71,6 +75,8 @@ public class GameManager : NetworkBehaviour
 
         // This is an event handler that catches collision detected in VirtualHand
         VirtualHand.OnCollision += HandleCollision;
+
+        startPressed.OnValueChanged += Nasilsin;
     }
 
     private void Update()
@@ -80,6 +86,8 @@ public class GameManager : NetworkBehaviour
             // Get a reference to the progress bar.
             progressBar = GameObject.Find("ProgressBar");
         }
+
+
     }
 
     #region OneTimeFunctions
@@ -133,6 +141,11 @@ public class GameManager : NetworkBehaviour
 
     #endregion
 
+    private void Nasilsin(int prev, int curr)
+    {
+        Debug.Log("Start pressed num = " + startPressed.Value.ToString());
+    }
+
     /**
      * Just a little helper to transform the stack of (padID | duration) tuples into a list of padIDs.
      */
@@ -148,32 +161,7 @@ public class GameManager : NetworkBehaviour
         return sequenceList;
     }
 
-    private void PlaceStepperOnBar(string padID, double offsetPercentage)
-    {
-        if (!progressBar) return;
-
-        // Create a new stepper.
-        var stepper = Instantiate(progressBarStepper);
-
-        // Make it a child of the bar.
-        stepper.transform.parent = progressBar.transform;
-
-        // Make it a child of the bar.
-        stepper.transform.localRotation = Quaternion.Euler(new Vector3(0f,0f,90f));
-
-        var relativePositionOnBar = 2 * (float)offsetPercentage;
-        //var barRootOffset = progressBar.transform.localScale.y / 2;
-
-        // Place it in the root of its parent, the bar, and apply the Y-offset relative to the bar's length.
-        // Apply a negative offset, too, so the steppers don't start in the middle of the bar but in the left end of it.
-        stepper.transform.localPosition = new(
-            0, 
-            -1 + relativePositionOnBar, 
-            0);
-
-        var padStepperTuple = new Tuple<string, GameObject>(padID, stepper);
-        progressBarSteppers.Add(padStepperTuple);
-    }
+   
 
     /**
      * All collisions land in this method, including pads and button(s).
@@ -189,38 +177,7 @@ public class GameManager : NetworkBehaviour
         if (startButton.name == collidedObject.name && isPlayingSequence == false)
         {
             isPlayingSequence = true;
-
-            RandomlyChoosePadColorServerRpc();
-
-            if (!firstStart)
-            {
-                firstStart = true;
-
-                Debug.Log("Game is Starting");
-
-                // Access all pads and sync them up.
-                foreach (var keyValuePair in padMap)
-                {
-                    MadPads_Pad pad = keyValuePair.Value;
-                    pad.Sync();
-                }
-            }
-            else
-            {
-                sequence = RandomSequenceGenerator();
-
-                // Keep track of the correct sequence, no matter what happens to the stack.
-                correctSequence = GetListFromSequenceStack(sequence);
-
-                // Reset the players' progress.
-                currentlyTrackedSequence.Clear();
-                correctlyPlayedSequence.Clear();
-
-                ResetSteppers();
-            }
-
-            SequencePlayer(sequence);
-
+            StartHitServerRpc();
             StartCoroutine(ResetCubeInteractivity());
         }
 
@@ -233,15 +190,7 @@ public class GameManager : NetworkBehaviour
 
     #region StartButtonFunctions
 
-    void ResetSteppers()
-    {
-        foreach (var stepper in progressBarSteppers)
-        {
-            Destroy(stepper.Item2);
-        }
-
-        progressBarSteppers.Clear();
-    }
+    
 
     /**
      * Plays the given sequence popping all samples needing playing from the stack.
@@ -259,7 +208,7 @@ public class GameManager : NetworkBehaviour
             
             StartCoroutine(PlaySampleCoroutine(padName, sampleDuration, prevDuration));
 
-            PlaceStepperOnBar(padName, prevDuration / sequenceLength);
+            PlaceStepperOnBarClientRpc(padName, prevDuration / sequenceLength);
 
             /**
              * !!!IMPORTANT!!!
@@ -333,16 +282,11 @@ public class GameManager : NetworkBehaviour
         return randomSequence;
     }
 
-    #endregion
-
-    #region rpcs
-
     /**
-     * This RPC will create random colors for each pad and then tell every client to set that color.
-     * This way the colors will be random but equal on all clients.
-     */ 
-    [ServerRpc(RequireOwnership = false)]
-    public void RandomlyChoosePadColorServerRpc()
+    * This RPC will create random colors for each pad and then tell every client to set that color.
+    * This way the colors will be random but equal on all clients.
+    */
+    public void RandomlyChoosePadColor()
     {
         foreach (var keyValuePair in padMap)
         {
@@ -356,6 +300,12 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+    #endregion
+
+    #region rpcs
+
+
+
     [ClientRpc]
     public void SetRandomlyChoosenPadColorClientRpc(string key, Color color)
     {
@@ -366,7 +316,6 @@ public class GameManager : NetworkBehaviour
         pad.SyncColor(color);
     }
 
-    #endregion
 
     [ServerRpc(RequireOwnership = false)]
     public void ValidatePlayedSoundServerRpc(string padID)
@@ -448,6 +397,77 @@ public class GameManager : NetworkBehaviour
             currentlyTrackedSequence.Clear();
         }
     }
+    [ServerRpc(RequireOwnership = false)]
+    private void StartHitServerRpc()
+    {
+        startPressed.Value += 1;
+
+        RandomlyChoosePadColor();
+
+        if (startPressed.Value == 1)
+        {
+            Debug.Log("Game is Starting");
+
+            // Access all pads and sync them up.
+            foreach (var keyValuePair in padMap)
+            {
+                MadPads_Pad pad = keyValuePair.Value;
+                pad.Sync();
+            }
+        }
+        else
+        {
+            sequence = RandomSequenceGenerator();
+
+            // Keep track of the correct sequence, no matter what happens to the stack.
+            correctSequence = GetListFromSequenceStack(sequence);
+
+            // Reset the players' progress.
+            currentlyTrackedSequence.Clear();
+            correctlyPlayedSequence.Clear();
+
+            ResetSteppersClientRpc();
+        }
+        SequencePlayer(sequence);
+    }
+    [ClientRpc]
+    //TO:DO buggy fix it boiiii
+    private void PlaceStepperOnBarClientRpc(string padID, double offsetPercentage)
+    {
+        if (!progressBar) return;
+
+        // Create a new stepper.
+        var stepper = Instantiate(progressBarStepper);
+
+        // Make it a child of the bar.
+        stepper.transform.parent = progressBar.transform;
+
+        var relativePositionOnBar = 2 * (float)offsetPercentage;
+        //var barRootOffset = progressBar.transform.localScale.y / 2;
+
+        // Place it in the root of its parent, the bar, and apply the Y-offset relative to the bar's length.
+        // Apply a negative offset, too, so the steppers don't start in the middle of the bar but in the left end of it.
+        stepper.transform.localPosition = new(
+            0,
+            -1 + relativePositionOnBar,
+            0);
+
+        var padStepperTuple = new Tuple<string, GameObject>(padID, stepper);
+        progressBarSteppers.Add(padStepperTuple);
+    }
+
+    [ClientRpc]
+    void ResetSteppersClientRpc()
+    {
+        foreach (var stepper in progressBarSteppers)
+        {
+            Destroy(stepper.Item2);
+        }
+
+        progressBarSteppers.Clear();
+    }
+
+    #endregion
 
     IEnumerator TimeoutCoroutine()
     {

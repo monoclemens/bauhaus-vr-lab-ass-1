@@ -182,6 +182,7 @@ public class NetworkedAudioPlayer : NetworkBehaviour
             StartCoroutine(FadeOut((float)duration));
             audioSource.Play();
             audioSource.SetScheduledEndTime(AudioSettings.dspTime + (duration));
+            Debug.Log("Successfully played!");
         }
         else
         {
