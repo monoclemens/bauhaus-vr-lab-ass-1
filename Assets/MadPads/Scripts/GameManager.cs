@@ -320,12 +320,6 @@ public class GameManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void ValidatePlayedSoundServerRpc(string padID)
     {
-        ValidatePlayedSoundClientRpc(padID);
-    }
-
-    [ClientRpc]
-    public void ValidatePlayedSoundClientRpc(string padID)
-    {
         Debug.Log($"Sound played by pad {padID}");
 
         Debug.Assert(correctSequence != null, "There is no defined sequence yet!");
@@ -340,25 +334,7 @@ public class GameManager : NetworkBehaviour
         {
             Debug.Log("A correct pad was played!");
 
-            var stepperTuple = progressBarSteppers[currentIndex];
-
-            // Get the pad's color.
-            var padColor = padColorMap[stepperTuple.Item1];
-
-            // Get a reference to the stepper.
-            var stepper = stepperTuple.Item2;
-
-            // Get the Renderer component attached to the stepper.
-            Renderer renderer = stepper.GetComponent<Renderer>();
-
-            // Create a new material to prevent changing the color of all spheres sharing the same material.
-            Material newMaterial = new(renderer.material)
-            {
-                color = padColor
-            };
-
-            // Assign the new material to the sphere.
-            renderer.material = newMaterial;
+            ColorStepperClientRpc(currentIndex);
 
             if (isTimeoutRunning)
             {
@@ -396,6 +372,30 @@ public class GameManager : NetworkBehaviour
             // If the players make a mistake, clear the tracked sequence.
             currentlyTrackedSequence.Clear();
         }
+    }
+
+    [ClientRpc]
+    public void ColorStepperClientRpc(int stepperIndex)
+    {
+        var stepperTuple = progressBarSteppers[stepperIndex];
+
+        // Get the pad's color.
+        var padColor = padColorMap[stepperTuple.Item1];
+
+        // Get a reference to the stepper.
+        var stepper = stepperTuple.Item2;
+
+        // Get the Renderer component attached to the stepper.
+        Renderer renderer = stepper.GetComponent<Renderer>();
+
+        // Create a new material to prevent changing the color of all spheres sharing the same material.
+        Material newMaterial = new(renderer.material)
+        {
+            color = padColor
+        };
+
+        // Assign the new material to the sphere.
+        renderer.material = newMaterial;
     }
     [ServerRpc(RequireOwnership = false)]
     private void StartHitServerRpc()
