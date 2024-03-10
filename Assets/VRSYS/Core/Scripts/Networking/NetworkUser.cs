@@ -133,7 +133,7 @@ namespace VRSYS.Core.Networking
                     GameObject instantiatedObject = Instantiate(trackerPrefab);
 
                     // Set the initial position
-                    instantiatedObject.transform.position = new Vector3(0f,0.05f, 0.4f);
+                    instantiatedObject.transform.position = new Vector3(0f, 0.11f, 0.4f);
 
                     // Set the initial object name
                     instantiatedObject.name = "ProgressBar";

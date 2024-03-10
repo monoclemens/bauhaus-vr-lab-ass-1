@@ -435,6 +435,8 @@ public class GameManager : NetworkBehaviour
     private void PlaceStepperOnBarClientRpc(string padID, double offsetPercentage)
     {
         if (!progressBar) return;
+        //The bar length on y axis
+        var barLength = progressBar.GetComponent<MeshFilter>().mesh.bounds.size.y;
 
         // Create a new stepper.
         var stepper = Instantiate(progressBarStepper);
@@ -442,15 +444,20 @@ public class GameManager : NetworkBehaviour
         // Make it a child of the bar.
         stepper.transform.parent = progressBar.transform;
 
-        var relativePositionOnBar = 2 * (float)offsetPercentage;
-        //var barRootOffset = progressBar.transform.localScale.y / 2;
+        var relativePositionOnBar = barLength * (float)offsetPercentage;
+        var barRootOffset = -(barLength / 2);
 
         // Place it in the root of its parent, the bar, and apply the Y-offset relative to the bar's length.
         // Apply a negative offset, too, so the steppers don't start in the middle of the bar but in the left end of it.
         stepper.transform.localPosition = new(
             0,
-            -1 + relativePositionOnBar,
+            barRootOffset + relativePositionOnBar,
             0);
+        // Set the initial scale
+        stepper.transform.localScale = new Vector3(0.07f,1.4f,1.4f);
+
+        // Set the initial local rotation
+        stepper.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, 90f));
 
         var padStepperTuple = new Tuple<string, GameObject>(padID, stepper);
         progressBarSteppers.Add(padStepperTuple);
