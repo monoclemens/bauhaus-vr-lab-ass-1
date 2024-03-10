@@ -76,7 +76,7 @@ public class GameManager : NetworkBehaviour
         // This is an event handler that catches collision detected in VirtualHand
         VirtualHand.OnCollision += HandleCollision;
 
-        startPressed.OnValueChanged += Nasilsin;
+        //startPressed.OnValueChanged += Nasilsin;
     }
 
     private void Update()
@@ -141,11 +141,6 @@ public class GameManager : NetworkBehaviour
 
     #endregion
 
-    private void Nasilsin(int prev, int curr)
-    {
-        Debug.Log("Start pressed num = " + startPressed.Value.ToString());
-    }
-
     /**
      * Just a little helper to transform the stack of (padID | duration) tuples into a list of padIDs.
      */
@@ -181,7 +176,7 @@ public class GameManager : NetworkBehaviour
             StartCoroutine(ResetCubeInteractivity());
         }
 
-        if (collidedObject.GetComponent<MadPads_Pad>() != null)
+        if (collidedObject.GetComponent<MadPads_Pad>() != null && startPressed.Value > 0)
         {
             MadPads_Pad playedPad = collidedObject.GetComponent<MadPads_Pad>();
             playedPad.Play();
@@ -189,9 +184,6 @@ public class GameManager : NetworkBehaviour
     }
 
     #region StartButtonFunctions
-
-    
-
     /**
      * Plays the given sequence popping all samples needing playing from the stack.
      */
@@ -257,11 +249,6 @@ public class GameManager : NetworkBehaviour
         
         double remainingSum = sequenceLength;
 
-        /**
-         * Double precision causes problems here because sometimes there is 0.399999 time left for instance
-         * 
-         * TODO: Add epsilon tolerance.
-         */
         while (remainingSum >= 0.4)
         {
             int randomSampleIndex = Random.Range(0, padMap.Count);
@@ -303,9 +290,6 @@ public class GameManager : NetworkBehaviour
     #endregion
 
     #region rpcs
-
-
-
     [ClientRpc]
     public void SetRandomlyChoosenPadColorClientRpc(string key, Color color)
     {
