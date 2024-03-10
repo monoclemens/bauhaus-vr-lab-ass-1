@@ -209,8 +209,6 @@ public class GameManager : NetworkBehaviour
              * Because a coroutine runs every frame.
              */
             prevDuration += sampleDuration;
-
-        
         }
     }
 
