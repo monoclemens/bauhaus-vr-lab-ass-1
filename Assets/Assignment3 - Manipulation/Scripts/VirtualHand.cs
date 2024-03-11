@@ -25,7 +25,6 @@ public class VirtualHand : MonoBehaviour
     
     // calculation variables
     private GameObject grabbedObject;
-    private MadPads_Pad playedPad;
     private GameObject hitObject;
     private Matrix4x4 offsetMatrix;
 
@@ -56,7 +55,6 @@ public class VirtualHand : MonoBehaviour
                 Destroy(this);
                 return;
             }
-        
     }
 
     private void Update()

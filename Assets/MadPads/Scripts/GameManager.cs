@@ -29,7 +29,7 @@ public class GameManager : NetworkBehaviour
     // These are the corresponding durations for note values (eigth -> 0.4 | quarter -> 0.8 | half -> 1.6 | dotted half -> 2.4).
     private List<double> possibleDurations = new List<double> { 0.4, 0.8, 1.6, 2.4 };
 
-    private NetworkedAudioPlayer startButton;
+    private GameObject startButton;
 
     private bool isPlayingSequence = false;
 
@@ -75,14 +75,12 @@ public class GameManager : NetworkBehaviour
          * Used to detect if the button is pressed.
          * Will need to change its name to, for example, StartButton.
          */
-        startButton = GameObject.Find("InteractableCube").GetComponent<NetworkedAudioPlayer>();
+        startButton = GameObject.Find("InteractableCube");
         
         SetInitialSequence();
 
         // This is an event handler that catches collision detected in VirtualHand
         VirtualHand.OnCollision += HandleCollision;
-
-        nextDuration.OnValueChanged += PrintNextDuration;
     }
 
     private void Update()
@@ -97,11 +95,6 @@ public class GameManager : NetworkBehaviour
     }
 
     #region OneTimeFunctions
-
-    private void PrintNextDuration(double prev, double curr)
-    {
-        Debug.Log(nextDuration.Value.ToString() + " " + curr.ToString() );
-    }
 
     // Put all pads into the padMap upon start.
     private void GetPads()
