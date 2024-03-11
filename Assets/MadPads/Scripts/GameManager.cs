@@ -33,6 +33,16 @@ public class GameManager : NetworkBehaviour
 
     private bool isPlayingSequence = false;
 
+    private NetworkVariable<int> startPressed = new(0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
+    private NetworkVariable<double> nextDuration = new(0,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
+
 
     #region validation variables
 
@@ -40,7 +50,8 @@ public class GameManager : NetworkBehaviour
     readonly float secondsToWait = 3f;
     Coroutine timeoutCoroutine;
     bool isTimeoutRunning = false;
-    List<string> correctSequence;
+    List<string> correctSequence = new();
+    List<double> correctDurations = new();
 
     GameObject progressBar;
     public GameObject progressBarStepper;
@@ -53,11 +64,6 @@ public class GameManager : NetworkBehaviour
 
     // The current progress of the players. With this we can visualize the "progress bar".
     readonly List<string> correctlyPlayedSequence = new();
-
-    private NetworkVariable<int> startPressed = new(0,
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server
-    );
 
     #endregion
 
@@ -76,7 +82,7 @@ public class GameManager : NetworkBehaviour
         // This is an event handler that catches collision detected in VirtualHand
         VirtualHand.OnCollision += HandleCollision;
 
-        //startPressed.OnValueChanged += Nasilsin;
+        nextDuration.OnValueChanged += PrintNextDuration;
     }
 
     private void Update()
@@ -91,6 +97,11 @@ public class GameManager : NetworkBehaviour
     }
 
     #region OneTimeFunctions
+
+    private void PrintNextDuration(double prev, double curr)
+    {
+        Debug.Log(nextDuration.Value.ToString() + " " + curr.ToString() );
+    }
 
     // Put all pads into the padMap upon start.
     private void GetPads()
@@ -136,7 +147,7 @@ public class GameManager : NetworkBehaviour
         sequence.Push(new Tuple<string, double>("Pad_CenterCenterLeftPads", 0.8));
         sequence.Push(new Tuple<string, double>("Pad_TopLeftLeftPads", 0.8));
 
-        correctSequence = GetListFromSequenceStack(sequence);
+        GetListFromSequenceStack(sequence);
     }
 
     #endregion
@@ -144,16 +155,15 @@ public class GameManager : NetworkBehaviour
     /**
      * Just a little helper to transform the stack of (padID | duration) tuples into a list of padIDs.
      */
-    private List<string> GetListFromSequenceStack(Stack<Tuple<string, double>> sequenceStack)
+    private void GetListFromSequenceStack(Stack<Tuple<string, double>> sequenceStack)
     {
-        List<string> sequenceList = new();
-
+        correctSequence.Clear();
+        correctDurations.Clear();
         foreach (var pair in sequenceStack)
         {
-            sequenceList.Add(pair.Item1);
+            correctSequence.Add(pair.Item1);
+            correctDurations.Add(pair.Item2);
         }
-
-        return sequenceList;
     }
 
    
@@ -179,7 +189,8 @@ public class GameManager : NetworkBehaviour
         if (collidedObject.GetComponent<MadPads_Pad>() != null && startPressed.Value > 0)
         {
             MadPads_Pad playedPad = collidedObject.GetComponent<MadPads_Pad>();
-            playedPad.Play();
+            Debug.Log("Next duration is: " + nextDuration.Value.ToString());
+            playedPad.Play(nextDuration.Value);
         }
     }
 
@@ -343,6 +354,8 @@ public class GameManager : NetworkBehaviour
             }
             else
             {
+                //Keep track of the duration for the next play
+                nextDuration.Value = correctDurations[currentIndex + 1];
                 // Start it again if there is work left to do.
                 timeoutCoroutine = StartCoroutine(TimeoutCoroutine());
             }
@@ -402,7 +415,7 @@ public class GameManager : NetworkBehaviour
             sequence = RandomSequenceGenerator();
 
             // Keep track of the correct sequence, no matter what happens to the stack.
-            correctSequence = GetListFromSequenceStack(sequence);
+            GetListFromSequenceStack(sequence);
 
             // Reset the players' progress.
             currentlyTrackedSequence.Clear();
@@ -410,10 +423,12 @@ public class GameManager : NetworkBehaviour
 
             ResetSteppersClientRpc();
         }
+        //Keep track of the duration for the next play
+        nextDuration.Value = correctDurations[0];
+
         SequencePlayer(sequence);
     }
     [ClientRpc]
-    //TO:DO buggy fix it boiiii
     private void PlaceStepperOnBarClientRpc(string padID, double offsetPercentage)
     {
         if (!progressBar) return;
@@ -473,5 +488,8 @@ public class GameManager : NetworkBehaviour
 
         // If the timeout has not been stopped, clear the tracked sequence.
         currentlyTrackedSequence.Clear();
+
+        //Keep track of the duration for the next play
+        nextDuration.Value = correctDurations[0];
     }
 }
