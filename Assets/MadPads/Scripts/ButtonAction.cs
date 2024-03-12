@@ -14,22 +14,24 @@ public class ButtonAction : MonoBehaviour
     //How much we want the "button" to go back
     private double buttonMargin = 0.2;
 
+    private new string name;
+
     void Start()
     {
         rigidBody = this.GetComponent<Rigidbody>();
-        
+        name = GetName(gameObject);
 
-        //the case of start button
-        if(gameObject.name == "InteractableCube")
+        // The case of start button
+        if (name == "InteractableCube")
         {
             back = Vector3.forward;
             originalValue = this.transform.localPosition.z;
         }
-        //The case of pads
+
+        // The case of pads
         else
         {
-            string greatGrandParentName = getGreatGrandParentName();
-            if (greatGrandParentName == "LeftPads")
+            if (name == "LeftPads")
             {
                 back = Vector3.left;
                 originalValue = -(this.transform.localPosition.x);
@@ -49,18 +51,32 @@ public class ButtonAction : MonoBehaviour
     {
         float axisValue = Vector3.Dot(back, transform.localPosition);
 
-        //Revert the motion if the threshold is exceeded
-        if (axisValue >= originalValue + buttonMargin)
+        if (name == "LeftPads")
         {
-            forwardMotion();
-        }
-        //Make the object stop if the button is back in the original location
-        if (axisValue <= originalValue)
+            // Revert the motion if the threshold is exceeded
+            if (axisValue >= originalValue + buttonMargin)
+            {
+                forwardMotion();
+            }
+            // Make the object stop if the button is back in the original location
+            if (axisValue <= originalValue)
+            {
+                rigidBody.velocity = Vector3.zero;
+            }
+        } 
+        else if (name == "RightPads")
         {
-            rigidBody.velocity = Vector3.zero;
+            // Revert the motion if the threshold is exceeded
+            if (axisValue <= originalValue - buttonMargin)
+            {
+                forwardMotion();
+            }
+            // Make the object stop if the button is back in the original location
+            if (axisValue >= originalValue)
+            {
+                rigidBody.velocity = Vector3.zero;
+            }
         }
-
-
     }
 
     private void backwardsMotion(GameObject collidedObject)
@@ -77,11 +93,18 @@ public class ButtonAction : MonoBehaviour
 
     private string getGreatGrandParentName()
     {
-
         return gameObject.transform
                 .parent.transform
                 .parent.transform
                 .parent.gameObject.name;
     }
 
+    private string GetName(GameObject gameObject)
+    {
+        if (gameObject.name == "InteractableCube") return gameObject.name;
+
+        if (getGreatGrandParentName() == "LeftPads") return "LeftPads";
+
+        return "RightPads";
+    }
 }
