@@ -170,7 +170,7 @@ public class GameManager : NetworkBehaviour
      * TODO: The initiation of audios need to take place in the second hitting of the button,
      *       so for now the changing of padaudio logic is faulty.
      */
-    private void HandleCollision(GameObject collidedObject)
+    public void HandleCollision(GameObject collidedObject)
     {
         if (startButton.name == collidedObject.name && isPlayingSequence == false)
         {
