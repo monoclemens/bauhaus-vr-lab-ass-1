@@ -105,7 +105,7 @@ public class MadPads_Pad : NetworkBehaviour
         InteractiveMaterial.SetColor(
             "_Color",
             InteractiveMaterial.color == color
-                ? Color.blue
+                ? Color.white
                 : color);
     }
 
